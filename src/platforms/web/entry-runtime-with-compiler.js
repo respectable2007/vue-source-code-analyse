@@ -1,5 +1,6 @@
 /* 独立构建版本的入口，它在entry-runtime的基础上
-添加了模板（template）到render函数的编译器 */
+   添加了模板（template）到render函数的编译器
+*/
 /* @flow */
 
 import config from 'core/config'

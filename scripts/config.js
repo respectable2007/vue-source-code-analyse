@@ -1,3 +1,4 @@
+/* rollup配置文件 */
 const path = require('path')
 const buble = require('rollup-plugin-buble')
 const alias = require('rollup-plugin-alias')
@@ -120,7 +121,9 @@ const builds = {
     banner
   },
   // Runtime+compiler development build (Browser)
+  // 开发环境下，入口是完整版，输出为UMD模块
   'web-full-dev': {
+    /* 与别名配置alias.js文件有关，入口文件绝对路径是'src/platforms/web/entry-runtime-with-compiler.js */
     entry: resolve('web/entry-runtime-with-compiler.js'),
     dest: resolve('dist/vue.js'),
     format: 'umd',
@@ -262,7 +265,7 @@ function genConfig (name) {
 
   return config
 }
-
+/* process.env.TARGET在npm package.json scripts配置项命令行中定义的*/
 if (process.env.TARGET) {
   module.exports = genConfig(process.env.TARGET)
 } else {
