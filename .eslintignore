@@ -1,0 +1,4 @@
+#eslint 忽略配置文件
+flow
+dist
+packages
