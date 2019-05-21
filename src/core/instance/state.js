@@ -320,6 +320,7 @@ export function stateMixin (Vue: Class<Component>) {
   // flow somehow has problems with directly declared definition object
   // when using Object.defineProperty, so we have to procedurally build up
   // the object here.
+  /* 定义$data、$props两个只读属性 */
   const dataDef = {}
   dataDef.get = function () { return this._data }
   const propsDef = {}
@@ -339,6 +340,7 @@ export function stateMixin (Vue: Class<Component>) {
   Object.defineProperty(Vue.prototype, '$data', dataDef)
   Object.defineProperty(Vue.prototype, '$props', propsDef)
 
+  /* 定义$set、$delete和$watch三个方法 */
   Vue.prototype.$set = set
   Vue.prototype.$delete = del
 
@@ -352,7 +354,7 @@ export function stateMixin (Vue: Class<Component>) {
       return createWatcher(vm, expOrFn, cb, options)
     }
     options = options || {}
-    options.user = true
+    options.user = true 
     const watcher = new Watcher(vm, expOrFn, cb, options)
     if (options.immediate) {
       try {
