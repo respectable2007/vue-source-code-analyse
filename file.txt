@@ -1,0 +1,10 @@
+Vue构造函数寻找路径
+config中input:src/platforms/web/entry-runtime-with-compiler.js
+->
+ entry-runtime-with-compiler.js中import Vue from './runtime/index
+ ->
+ index.js中import Vue from 'core/index'
+ ->
+ index.js中import Vue from './instance/index'
+ ->
+ index.js中function Vue(...){...}
