@@ -1,3 +1,4 @@
+/* Vue平台化包装 */
 /* @flow */
 
 import Vue from 'core/index'
@@ -19,6 +20,7 @@ import { patch } from './patch'
 import platformDirectives from './directives/index'
 import platformComponents from './components/index'
 
+/* 覆盖Vue静态属性默认值，安装平台特定工具 */
 // install platform specific utils
 Vue.config.mustUseProp = mustUseProp
 Vue.config.isReservedTag = isReservedTag
@@ -27,9 +29,25 @@ Vue.config.getTagNamespace = getTagNamespace
 Vue.config.isUnknownElement = isUnknownElement
 
 // install platform runtime directives & components
+/* 安装平台运行时的命令和组件
+   Vue.options = {
+     components: {
+       keepAlive,
+       Transitions,
+       TransitionGroup
+     },
+     directives: {
+       model,
+       show
+     },
+     filters: Object.create(null),
+     _base: Vue
+   }
+*/
 extend(Vue.options.directives, platformDirectives)
 extend(Vue.options.components, platformComponents)
 
+/* 安装平台特定方法 */
 // install platform patch function
 Vue.prototype.__patch__ = inBrowser ? patch : noop
 
@@ -42,6 +60,7 @@ Vue.prototype.$mount = function (
   return mountComponent(this, el, hydrating)
 }
 
+/* setTimeout内vue-devtools全局钩子 */
 // devtools global hook
 /* istanbul ignore next */
 if (inBrowser) {
@@ -73,4 +92,5 @@ if (inBrowser) {
   }, 0)
 }
 
+/* 输出Vue */
 export default Vue

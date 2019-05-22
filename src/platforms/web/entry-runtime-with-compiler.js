@@ -7,17 +7,24 @@ import config from 'core/config'
 import { warn, cached } from 'core/util/index'
 import { mark, measure } from 'core/util/perf'
 
+/* 运行时入口文件 */
 import Vue from './runtime/index'
 import { query } from './util/index'
+/* 编译器 */
 import { compileToFunctions } from './compiler/index'
 import { shouldDecodeNewlines, shouldDecodeNewlinesForHref } from './util/compat'
 
+/* 类似于柯里化，实现缓存功能，调用idToTemplate，返回具有指定id属性值DOM元素的innerHTML */
 const idToTemplate = cached(id => {
   const el = query(id)
+  /* &&短路 */
   return el && el.innerHTML
 })
 
+/* 缓存Vue.$mount实例方法 */
 const mount = Vue.prototype.$mount
+
+/* 重写Vue.$mount方法 */
 Vue.prototype.$mount = function (
   el?: string | Element,
   hydrating?: boolean
@@ -89,6 +96,7 @@ Vue.prototype.$mount = function (
  * Get outerHTML of elements, taking care
  * of SVG elements in IE as well.
  */
+/* 定义getOuterHTML函数，用于获取元素的outerHTML */
 function getOuterHTML (el: Element): string {
   if (el.outerHTML) {
     return el.outerHTML
@@ -99,6 +107,7 @@ function getOuterHTML (el: Element): string {
   }
 }
 
+/* Vue添加compile全局API，compileToFunctions来自于compiler/index */
 Vue.compile = compileToFunctions
 
 export default Vue

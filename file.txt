@@ -1,10 +1,20 @@
 Vue构造函数寻找路径
 config中input:src/platforms/web/entry-runtime-with-compiler.js
 ->
- entry-runtime-with-compiler.js中import Vue from './runtime/index
+ entry-runtime-with-compiler.js中import Vue from './runtime/index        再添加编译器
+ ->                                                                        ^
+ index.js中import Vue from 'core/index'                                  再添加平台特定配置、指令、组件和方法
+ ->                                                                        ^
+ index.js中import Vue from './instance/index'                            再添加静态属性和方法（全局API）
+ ->                                                                        ^
+ index.js中function Vue(...){...}                                        定义Vue构造函数，添加实例属性和方法
+
+ Vue静态属性和方法
+ core/index
+
+
+ Vue平台化包装，添加与平台相关的组件、命令和一些特殊功能
+ platforms
  ->
- index.js中import Vue from 'core/index'
- ->
- index.js中import Vue from './instance/index'
- ->
- index.js中function Vue(...){...}
+  web
+  weex

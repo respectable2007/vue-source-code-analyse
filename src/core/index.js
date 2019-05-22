@@ -1,4 +1,4 @@
-/* 存放通用的，与平台无关的代码 */
+/* 存放核心代码，与平台无关 */
 import Vue from './instance/index'
 import { initGlobalAPI } from './global-api/index'
 import { isServerRendering } from 'core/util/env'
