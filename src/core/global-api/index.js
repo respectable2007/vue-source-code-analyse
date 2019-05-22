@@ -22,6 +22,9 @@ import keepAlive from '../components/keep-alive';
 
 export function initGlobalAPI (Vue: GlobalAPI) {
   /* 在Vue构造函数上，添加config只读静态属性，config来自于core/config */
+  /* 因为config在getter外部已声明，所以可通过Vue.config读取和写入config属性，如下：
+     Vue.config.performance = true
+  */
   // config
   const configDef = {}
   configDef.get = () => config

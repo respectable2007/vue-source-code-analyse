@@ -18,7 +18,16 @@ export function initMixin (Vue: Class<Component>) {
     const vm: Component = this
     // a uid
     vm._uid = uid++
-
+    
+    /* Vue.config.performance，设置为true，即开启性能追踪。
+       追踪场景：组件初始化；
+                编译-将模板编译为渲染函数；
+                渲染-渲染函数的性能（渲染函数执行且生成虚拟DOM的性能）；
+                打补丁-虚拟DOM渲染为真实DOM的性能
+       使用方法：在代码开头和结尾使用mark函数打标记，在结尾，使用measure
+       函数计算性能
+       API：window.performance
+    */
     let startTag, endTag
     /* istanbul ignore if */
     if (process.env.NODE_ENV !== 'production' && config.performance && mark) {
