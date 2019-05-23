@@ -32,4 +32,13 @@ mergeOptions 选项合并
   checkComponents + validateComponentName 验证注册组件名称是否合法
   -> isBuiltInTag -- src/shared/util 判断注册组件是否为Vue的内置标签（slot、component）
      isReservedTag -- core/platforms/web/util/element 判断注册组件是否为HTML标签、SVG标签
+  
+  normalizeProps 格式化props属性
+  -> camelize -- src/shared/util 短横线转换为驼峰
+     isPlainObject -- src/shared/util 判断是否为一个纯对象
+     toRawType -- src/shared/util 获取数据类型
+  
+  normalizeInject 格式化inject属性
+  -> 
+  normalizeDirectives 格式化Directives属性
  

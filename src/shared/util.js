@@ -161,8 +161,11 @@ export function cached<F: Function> (fn: F): F {
 /**
  * Camelize a hyphen-delimited string.
  */
+/* 将短横线转为驼峰 */
 const camelizeRE = /-(\w)/g
 export const camelize = cached((str: string): string => {
+  /* string.replace的第二个参数为函数，正则中有捕获组，函数的参数依次为匹配项，第一个捕获组
+  (_, c) => c,判断中横线后是否有字符 */
   return str.replace(camelizeRE, (_, c) => c ? c.toUpperCase() : '')
 })
 

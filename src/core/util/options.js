@@ -304,11 +304,17 @@ export function validateComponentName (name: string) {
  * Ensure all props option syntax are normalized into the
  * Object-based format.
  */
+/* 将Props选项格式化为对象形式，如下：
+   驼峰式属性名:{type: ...}
+*/
 function normalizeProps (options: Object, vm: ?Component) {
   const props = options.props
   if (!props) return
+  /* 声明一个空对象，用于保存格式化的结果 */
   const res = {}
+  /* 索引、属性值、驼峰后属性名 */
   let i, val, name
+  /* 字符串数组 */
   if (Array.isArray(props)) {
     i = props.length
     while (i--) {
@@ -320,6 +326,7 @@ function normalizeProps (options: Object, vm: ?Component) {
         warn('props must be strings when using array syntax.')
       }
     }
+  /* 对象 */
   } else if (isPlainObject(props)) {
     for (const key in props) {
       val = props[key]
@@ -328,6 +335,7 @@ function normalizeProps (options: Object, vm: ?Component) {
         ? val
         : { type: val }
     }
+  /* 不是以上两种类型，非生产环境下报错，生产环境忽视 */
   } else if (process.env.NODE_ENV !== 'production') {
     warn(
       `Invalid value for option "props": expected an Array or an Object, ` +
@@ -335,12 +343,23 @@ function normalizeProps (options: Object, vm: ?Component) {
       vm
     )
   }
+  /* 重写options的props */
   options.props = res
 }
 
 /**
  * Normalize all injections into Object-based format
  */
+/* inject选项格式化为一个对象，如下：
+   {
+     'name': {
+       from: x
+     }
+   }
+   字符串数组：x为数组项
+   对象：对象属性值不为纯对象，x为对象属性值；
+        对象属性值为纯对象，x为对象值与{from: 属性名}和属性值合并结果
+*/
 function normalizeInject (options: Object, vm: ?Component) {
   const inject = options.inject
   if (!inject) return
@@ -404,7 +423,9 @@ export function mergeOptions (
     /* 验证子组件名称是否合法 */
     checkComponents(child)
   }
-
+  
+  /* 合并另一种Vue实例构造函数的选项
+   */
   if (typeof child === 'function') {
     child = child.options
   }
