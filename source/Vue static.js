@@ -18,7 +18,7 @@ Vue.options = {
   components: {
     KeepAlive
   },
-  directives: Object.create(null),
+  directives: Object.create(null),//注册局部指令
   filters: Object.create(null),
   _base: Vue
 }

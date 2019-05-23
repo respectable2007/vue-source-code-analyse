@@ -363,11 +363,14 @@ function normalizeProps (options: Object, vm: ?Component) {
 function normalizeInject (options: Object, vm: ?Component) {
   const inject = options.inject
   if (!inject) return
+  /* 重写options.inject,与normalize指向同一个对象 */
   const normalized = options.inject = {}
+  /* 字符串数组 */
   if (Array.isArray(inject)) {
     for (let i = 0; i < inject.length; i++) {
       normalized[inject[i]] = { from: inject[i] }
     }
+  /* 纯对象 */
   } else if (isPlainObject(inject)) {
     for (const key in inject) {
       const val = inject[key]
@@ -375,6 +378,7 @@ function normalizeInject (options: Object, vm: ?Component) {
         ? extend({ from: key }, val)
         : { from: val }
     }
+  /* 即不是纯对象，也不是字符串数组，非生产环境警告 */
   } else if (process.env.NODE_ENV !== 'production') {
     warn(
       `Invalid value for option "inject": expected an Array or an Object, ` +
@@ -387,11 +391,20 @@ function normalizeInject (options: Object, vm: ?Component) {
 /**
  * Normalize raw function directives into object format.
  */
+/* directives格式化为一个对象，如下：
+   directives：{
+     key1: {
+       bind: fn,
+       update: fn
+     }
+   }
+*/
 function normalizeDirectives (options: Object) {
   const dirs = options.directives
   if (dirs) {
     for (const key in dirs) {
       const def = dirs[key]
+
       if (typeof def === 'function') {
         dirs[key] = { bind: def, update: def }
       }
@@ -429,6 +442,8 @@ export function mergeOptions (
   if (typeof child === 'function') {
     child = child.options
   }
+  
+  /* 选项允许多种形式写法，但会在内部格式化为同一种写法，以便之后统一处理 */
 
   /* 格式化child的props属性 */
   normalizeProps(child, vm)
@@ -442,9 +457,11 @@ export function mergeOptions (
   // the result of another mergeOptions call.
   // Only merged options has the _base property.
   if (!child._base) {
+    /* extends：对象 */
     if (child.extends) {
       parent = mergeOptions(parent, child.extends, vm)
     }
+    /* mixins：对象数组 */
     if (child.mixins) {
       for (let i = 0, l = child.mixins.length; i < l; i++) {
         parent = mergeOptions(parent, child.mixins[i], vm)

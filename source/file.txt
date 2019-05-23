@@ -39,6 +39,8 @@ mergeOptions 选项合并
      toRawType -- src/shared/util 获取数据类型
   
   normalizeInject 格式化inject属性
-  -> 
+  -> isPlainObject -- src/shared/util 判断是否为一个纯对象
+     toRawType -- src/shared/util 获取数据类型
+
   normalizeDirectives 格式化Directives属性
- 
+  

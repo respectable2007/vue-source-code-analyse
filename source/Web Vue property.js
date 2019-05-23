@@ -33,6 +33,7 @@ Vue.options = {
     TransitionGroup
   },
   directives: {
+    /* Vue内置指令 */
     model,
     show
   },
@@ -46,11 +47,11 @@ Vue.mixin
 Vue.cid
 Vue.extend
 
-/* 注册组件 */
+/* 注册全局组件 */
 Vue.component
-/* 注册指令 */
+/* 注册全局指令 */
 Vue.directive
-/* 注册过滤器 */
+/* 注册全局过滤器 */
 Vue.filter
 
 Object.defineProperty(Vue, 'FunctionalRenderContext', {
