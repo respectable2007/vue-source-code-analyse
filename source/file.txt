@@ -23,5 +23,13 @@ Vue构造函数寻找路径
 
 core/instance/init.js
 ->
-  mark/measure -- core/util/perf.js
-  mergeOptions -- core/util/options.js
+  mark/measure -- core/util/perf.js 计算性能
+  mergeOptions -- core/util/options.js 选项合并
+
+core/util/options.js
+mergeOptions 选项合并
+->
+  checkComponents + validateComponentName 验证注册组件名称是否合法
+  -> isBuiltInTag -- src/shared/util 判断注册组件是否为Vue的内置标签（slot、component）
+     isReservedTag -- core/platforms/web/util/element 判断注册组件是否为HTML标签、SVG标签
+ 

@@ -7,7 +7,7 @@ import { compileToFunctions } from "../src/platforms/web/compiler";
 Vue.config = {
  //...
  mustUseProp: mustUseProp,
- isReservedTag: isReservedTag,
+ isReservedTag: isReservedTag,  //core/platforms/web/util/element
  isReservedAttr: isReservedAttr,
  getTagNamespace: getTagNamespace,
  isUnknownElement: isUnknownElement

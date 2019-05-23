@@ -290,7 +290,7 @@ export function validateComponentName (name: string) {
     )
   }
   /* isBuiltInTag：判断注册组件是否为Vue的内置标签（slot、component）
-     config.isReservedTag：
+     config.isReservedTag：判断注册组件是否为HTML标签、SVG标签
   */
   if (isBuiltInTag(name) || config.isReservedTag(name)) {
     warn(
