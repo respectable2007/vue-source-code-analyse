@@ -27,15 +27,22 @@ import {
  * value into the final value.
  */
 /* 一个空对象，相当于strats为Vue.config.optionMergeStrategies，
-   开发者可以重新改参数，默认值为Object.create(null)
+   开发者可以重新改参数，默认值为Object.create(null)，
+   是合并选项策略的对象，包含任意函数，开发者可为某个选项，自定义
+   合并选项函数，只需要在Vue.config.optionMergeStrategies添加
 */
 const strats = config.optionMergeStrategies
 
+/* 某些选项合并策略 */
 /**
  * Options with restrictions
  */
+/* 非生产环境，el/propsData选项合并策略，使用默认策略 */
 if (process.env.NODE_ENV !== 'production') {
   strats.el = strats.propsData = function (parent, child, vm, key) {
+    /* vm是否存在，可判断Vue是否为new创建的Vue实例 
+       ---》判断是否为子组件，是因为Vue.extend（子类）中调用mergeOptions未传入vm
+    */
     if (!vm) {
       warn(
         `option "${key}" can only be used during instance ` +
@@ -264,7 +271,9 @@ strats.provide = mergeDataOrFn
 /**
  * Default strategy.
  */
-/* 一个函数，childVal不为undefined，则返回childVal，为undefined，则返回parentVal。
+/* 默认合并选项策略函数
+   childVal不为undefined，则返回childVal；
+   为undefined，则返回parentVal。
    即最终以child属性值为主
 */
 const defaultStrat = function (parentVal: any, childVal: any): any {
@@ -476,12 +485,16 @@ export function mergeOptions (
     mergeField(key)
   }
   for (key in child) {
+    /* 合并child有，parent没有的属性，避免重复调用 */
     if (!hasOwn(parent, key)) {
       mergeField(key)
     }
   }
   /* parent和child中，相同的key，值取child，parent实例不存在的key，取child */
   function mergeField (key) {
+    /* 若key有特定的合并选项函数，则使用它，若无，则使用默认合并选项函数 
+       el/propsData生产环境，为undefiend，使用默认合并策略，
+    */
     const strat = strats[key] || defaultStrat
     options[key] = strat(parent[key], child[key], vm, key)
   }

@@ -28,7 +28,7 @@ core/instance/init.js
 
 core/util/options.js
 mergeOptions 选项合并
-->
+->规范化
   checkComponents + validateComponentName 验证注册组件名称是否合法
   -> isBuiltInTag -- src/shared/util 判断注册组件是否为Vue的内置标签（slot、component）
      isReservedTag -- core/platforms/web/util/element 判断注册组件是否为HTML标签、SVG标签
@@ -43,4 +43,31 @@ mergeOptions 选项合并
      toRawType -- src/shared/util 获取数据类型
 
   normalizeDirectives 格式化Directives属性
-  
+
+->合并
+    mergeField 选择不同策略进行选项合并
+    hasOwn -- src/shared/util 判断对象是否含有某个实例属性
+    defaultStrat 默认选项合并策略
+    strats 一些选项合并函数
+    -> el/propsData 
+       data 
+       生命周期 -- src/shared/constants
+       -> beforeCreate
+          created
+          beforeMount
+          mounted
+          beforeUpdate
+          updated
+          beforeDestroy
+          destroyed
+          activated
+          deactivated
+          errorCaptured
+          serverPrefetch
+       配置 -- src/shared/constants
+       -> components 
+          directives
+          filters
+       watch
+       props/methods/inject/computed
+       provide

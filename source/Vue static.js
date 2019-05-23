@@ -27,6 +27,7 @@ Vue.options = {
 Vue.use
 Vue.mixin
 Vue.cid
+/* 创建子类 */
 Vue.extend
 
 /* 注册组件 */
