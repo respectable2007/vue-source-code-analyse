@@ -26,6 +26,9 @@ import {
  * how to merge a parent option value and a child option
  * value into the final value.
  */
+/* 一个空对象，相当于strats为Vue.config.optionMergeStrategies，
+   开发者可以重新改参数，默认值为Object.create(null)
+*/
 const strats = config.optionMergeStrategies
 
 /**
@@ -261,6 +264,9 @@ strats.provide = mergeDataOrFn
 /**
  * Default strategy.
  */
+/* 一个函数，childVal不为undefined，则返回childVal，为undefined，则返回parentVal。
+   即最终以child属性值为主
+*/
 const defaultStrat = function (parentVal: any, childVal: any): any {
   return childVal === undefined
     ? parentVal
@@ -283,6 +289,9 @@ export function validateComponentName (name: string) {
       'should conform to valid custom element name in html5 specification.'
     )
   }
+  /* isBuiltInTag：判断注册组件是否为Vue的内置标签（slot、component）
+     config.isReservedTag：
+  */
   if (isBuiltInTag(name) || config.isReservedTag(name)) {
     warn(
       'Do not use built-in or reserved HTML elements as component ' +
@@ -385,12 +394,14 @@ function assertObjectType (name: string, value: any, vm: ?Component) {
  * Merge two option objects into a new one.
  * Core utility used in both instantiation and inheritance.
  */
+/* 合并传参对象到一个新对象上 */
 export function mergeOptions (
   parent: Object,
   child: Object,
   vm?: Component
 ): Object {
   if (process.env.NODE_ENV !== 'production') {
+    /* 验证子组件名称是否合法 */
     checkComponents(child)
   }
 
@@ -398,8 +409,11 @@ export function mergeOptions (
     child = child.options
   }
 
+  /* 格式化child的props属性 */
   normalizeProps(child, vm)
+  /* 格式化child的inject属性 */
   normalizeInject(child, vm)
+  /* 格式化child的Directives属性 */
   normalizeDirectives(child)
 
   // Apply extends and mixins on the child options,
@@ -416,7 +430,8 @@ export function mergeOptions (
       }
     }
   }
-
+  
+  /* 声明一个空对象，用于保存对象合并结果 */
   const options = {}
   let key
   for (key in parent) {
@@ -427,6 +442,7 @@ export function mergeOptions (
       mergeField(key)
     }
   }
+  /* parent和child中，相同的key，值取child，parent实例不存在的key，取child */
   function mergeField (key) {
     const strat = strats[key] || defaultStrat
     options[key] = strat(parent[key], child[key], vm, key)

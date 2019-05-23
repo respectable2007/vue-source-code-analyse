@@ -19,3 +19,9 @@ Vue构造函数寻找路径
  ->
   web
   weex
+
+
+core/instance/init.js
+->
+  mark/measure -- core/util/perf.js
+  mergeOptions -- core/util/options.js

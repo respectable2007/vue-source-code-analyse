@@ -15,6 +15,7 @@ let uid = 0
 export function initMixin (Vue: Class<Component>) {
   /*  */
   Vue.prototype._init = function (options?: Object) {
+    /* 当前Vue实例对象，即new过程产生的对象 */
     const vm: Component = this
     // a uid
     vm._uid = uid++
@@ -36,15 +37,44 @@ export function initMixin (Vue: Class<Component>) {
       mark(startTag)
     }
 
+    /* Vue添加_isVue实例属性，
+       若一个实例具有_isVue属性，且为true，则表明为Vue实例 
+       避免被响应系统观察
+    */
     // a flag to avoid this being observed
     vm._isVue = true
     // merge options
+    /* 合并对象 */
+    /* Component初始化 */
     if (options && options._isComponent) {
       // optimize internal component instantiation
       // since dynamic options merging is pretty slow, and none of the
       // internal component options needs special treatment.
       initInternalComponent(vm, options)
-    } else {
+    } else { //Vue初始化
+      /* Vue实例添加$options属性，用于Vue实例初始化 */
+      /* 相当于
+         vm.$options = mergeOptions({
+           components:{
+             KeepAlive,
+             Transitions,
+             TransitionGroup
+           },
+           directives: {
+             model,
+             show
+           },
+           filters: Object.create(null),
+           _base: Vue
+         }, {
+           el: '#app',
+           data: {
+             test: 1
+           }
+         },
+           vm//当前Vue实例
+         )
+      */
       vm.$options = mergeOptions(
         resolveConstructorOptions(vm.constructor),
         options || {},
@@ -100,16 +130,21 @@ export function initInternalComponent (vm: Component, options: InternalComponent
   }
 }
 
+/* 解析当前实例构造函数options */
 export function resolveConstructorOptions (Ctor: Class<Component>) {
   let options = Ctor.options
+  /* Vue子类 */
   if (Ctor.super) {
     const superOptions = resolveConstructorOptions(Ctor.super)
     const cachedSuperOptions = Ctor.superOptions
+    /* 子类保存的父类Options与父类自身options是否相同，即父类options是否被改变过 */
     if (superOptions !== cachedSuperOptions) {
       // super option changed,
       // need to resolve new options.
+      /* 重写子类superOptions */
       Ctor.superOptions = superOptions
       // check if there are any late-modified/attached options (#4976)
+      /* vue-hot-reload-api 或 vue-loader的bug */
       const modifiedOptions = resolveModifiedOptions(Ctor)
       // update base extend options
       if (modifiedOptions) {

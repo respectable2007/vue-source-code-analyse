@@ -1,5 +1,3 @@
-import { compileToFunctions } from "../src/platforms/web/compiler";
-
 /* Vue的静态属性 */
 
 Vue.config
@@ -18,7 +16,7 @@ Vue.observable
 
 Vue.options = {
   components: {
-    keepAlive
+    KeepAlive
   },
   directives: Object.create(null),
   filters: Object.create(null),
@@ -29,6 +27,7 @@ Vue.options = {
 Vue.use
 Vue.mixin
 Vue.cid
+Vue.extend
 
 /* 注册组件 */
 Vue.component
@@ -42,6 +41,3 @@ Object.defineProperty(Vue, 'FunctionalRenderContext', {
 })
 
 Vue.version = '__VERSION__'
-
-Vue.compile = compileToFunctions
-
