@@ -234,6 +234,9 @@ ASSET_TYPES.forEach(function (type) {
  * Watchers hashes should not overwrite one
  * another, so we merge them as arrays.
  */
+/* 返回一个对象，parentVal和childVal均存在时，对象中属性值都为数组，
+   因此，该选项属性值可能是数组、函数、字符串、对象
+*/
 strats.watch = function (
   parentVal: ?Object,
   childVal: ?Object,
@@ -241,6 +244,7 @@ strats.watch = function (
   key: string
 ): ?Object {
   // work around Firefox's Object.prototype.watch...
+  /* 若参数与内置watch相同，说明用户并未设置watch选项，则将其置空 */
   if (parentVal === nativeWatch) parentVal = undefined
   if (childVal === nativeWatch) childVal = undefined
   /* istanbul ignore if */
@@ -249,6 +253,7 @@ strats.watch = function (
     assertObjectType(key, childVal, vm)
   }
   if (!parentVal) return childVal
+  /* 声明一个空对象，用于保存新watch对象 */
   const ret = {}
   extend(ret, parentVal)
   for (const key in childVal) {
@@ -257,6 +262,10 @@ strats.watch = function (
     if (parent && !Array.isArray(parent)) {
       parent = [parent]
     }
+    /* 检测子选项中的值是否也在父选项中，
+       如果在的话将父子选项合并到一个数组，
+       否则直接把子选项变成一个数组返回。
+    */
     ret[key] = parent
       ? parent.concat(child)
       : Array.isArray(child) ? child : [child]
