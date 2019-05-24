@@ -50,7 +50,14 @@ mergeOptions 选项合并
     defaultStrat 默认选项合并策略
     strats 一些选项合并函数
     -> el/propsData 
-       data 
+       data 返回一个函数，并将选项合并的结果保存在函数内
+       -> mergeDataOrFn 
+         -> mergeData data选项终极合并函数
+           -> hasSymbol -- src/core/util/env.js 当前环境是否支持符号属性
+              hasOwn -- src/shared/util 判断对象是否含有某个实例属性
+              set -- src/core/observer/index 添加对象实例属性和通知属性已删除
+              -> isUndef --src/shared/util 判断数据是否为undefined或null 
+                 isPrimitive --src/shared/util 判断数据是否基本类型 
        生命周期 -- src/shared/constants
        -> beforeCreate
           created

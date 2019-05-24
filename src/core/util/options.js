@@ -56,6 +56,7 @@ if (process.env.NODE_ENV !== 'production') {
 /**
  * Helper that recursively merges two data objects together.
  */
+/* 返回一个对象，以to对象原始数据为主，to没有，from有，则并入to中 */
 function mergeData (to: Object, from: ?Object): Object {
   if (!from) return to
   let key, toVal, fromVal
@@ -70,6 +71,7 @@ function mergeData (to: Object, from: ?Object): Object {
     if (key === '__ob__') continue
     toVal = to[key]
     fromVal = from[key]
+    /* 合并 */
     if (!hasOwn(to, key)) {
       set(to, key, fromVal)
     } else if (
@@ -86,13 +88,21 @@ function mergeData (to: Object, from: ?Object): Object {
 /**
  * Data
  */
+/* 返回值情况如下：
+   子组件：data本身；父类的data选项；mergedDataFn
+   new实例：mergedInstanceDataFn */
 export function mergeDataOrFn (
   parentVal: any,
   childVal: any,
   vm?: Component
 ): ?Function {
+  /* 子组件 -> Vue.extend -> mergeOptions(p,c) */
   if (!vm) {
+    /* 子组件使用Vue.extend进行选项合并，父子data选项都必须是函数 */
     // in a Vue.extend merge, both should be functions
+    /* 在子组件时，调用strats.data，那么parentVal、childVal二者必存在其一，
+       且二者都是函数
+    */
     if (!childVal) {
       return parentVal
     }
@@ -104,6 +114,7 @@ export function mergeDataOrFn (
     // merged result of both functions... no need to
     // check if parentVal is a function here because
     // it has to be a function to pass previous merges.
+    /* 二者均存在，则返回mergeDataFn*/
     return function mergedDataFn () {
       return mergeData(
         typeof childVal === 'function' ? childVal.call(this, this) : childVal,
@@ -128,12 +139,17 @@ export function mergeDataOrFn (
   }
 }
 
+/* 调用data选项合并策略，子组件和new创建实例的情况下，均返回一个函数；
+   这些函数执行后，最终返回值为一个对象
+*/
 strats.data = function (
   parentVal: any,
   childVal: any,
   vm?: Component
 ): ?Function {
+  /* 子组件 */
   if (!vm) {
+    /* 子组件传入data，但data不是函数类型，则警告，并返回parentVal（函数） */
     if (childVal && typeof childVal !== 'function') {
       process.env.NODE_ENV !== 'production' && warn(
         'The "data" option should be a function ' +
@@ -141,12 +157,13 @@ strats.data = function (
         'definitions.',
         vm
       )
-
+     
       return parentVal
     }
+    /* 未传入，或传入且data是函数类型，则返回mergeDataOrFn返回值 */
     return mergeDataOrFn(parentVal, childVal)
   }
-
+  /* new创建的实例，则返回mergeDataOrFn返回值 */
   return mergeDataOrFn(parentVal, childVal, vm)
 }
 
