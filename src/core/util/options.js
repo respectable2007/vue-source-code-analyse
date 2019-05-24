@@ -265,6 +265,7 @@ strats.watch = function (
     /* 检测子选项中的值是否也在父选项中，
        如果在的话将父子选项合并到一个数组，
        否则直接把子选项变成一个数组返回。
+       父子相同的watch选项，都会被观察
     */
     ret[key] = parent
       ? parent.concat(child)
@@ -276,6 +277,7 @@ strats.watch = function (
 /**
  * Other object hashes.
  */
+/* 返回一个合并对象 */
 strats.props =
 strats.methods =
 strats.inject =
@@ -294,6 +296,7 @@ strats.computed = function (
   if (childVal) extend(ret, childVal)
   return ret
 }
+/* 返回一个函数 */
 strats.provide = mergeDataOrFn
 
 /**
