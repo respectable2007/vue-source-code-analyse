@@ -170,6 +170,7 @@ strats.data = function (
 /**
  * Hooks and props are merged as arrays.
  */
+/* 各生命周期钩子选项合并策略，返回一个数组 */
 function mergeHook (
   parentVal: ?Array<Function>,
   childVal: ?Function | ?Array<Function>
@@ -186,6 +187,7 @@ function mergeHook (
     : res
 }
 
+/* 去重 */
 function dedupeHooks (hooks) {
   const res = []
   for (let i = 0; i < hooks.length; i++) {

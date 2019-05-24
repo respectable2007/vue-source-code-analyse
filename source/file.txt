@@ -58,23 +58,26 @@ mergeOptions 选项合并
               set -- src/core/observer/index 添加对象实例属性和通知属性已删除
               -> isUndef --src/shared/util 判断数据是否为undefined或null 
                  isPrimitive --src/shared/util 判断数据是否基本类型 
+            
        生命周期 -- src/shared/constants
-       -> beforeCreate
-          created
-          beforeMount
-          mounted
-          beforeUpdate
-          updated
-          beforeDestroy
-          destroyed
-          activated
-          deactivated
-          errorCaptured
-          serverPrefetch
-       配置 -- src/shared/constants
-       -> components 
-          directives
-          filters
+       beforeCreate
+       created
+       beforeMount
+       mounted
+       beforeUpdate
+       updated
+       beforeDestroy
+       destroyed
+       activated
+       deactivated
+       errorCaptured
+       serverPrefetch
+
+       资源（assets） -- src/shared/constants
+       components 
+       directives
+       filters
+
        watch
        props/methods/inject/computed
        provide
