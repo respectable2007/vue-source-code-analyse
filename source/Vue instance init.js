@@ -21,7 +21,7 @@ vm._isBeingDestroyed = false
 
 // initEvents(vm)   src/core/instance/events.js **************************************************
 vm._events = Object.create(null)
-vm._hasHookEvent = false
+vm._hasHookEvent = false //判断是否存在生命周期钩子的事件监听器
 
 // initRender(vm)   src/core/instance/render.js **************************************************
 vm._vnode = null // the root of the child tree
