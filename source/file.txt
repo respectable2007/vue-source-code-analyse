@@ -100,7 +100,13 @@ initEvents --src/core/instance/events.js 初始化事件
   -> updateComponenetListeners 更新组件事件监听
     -> updateListeners --src/core/vdom/helpers/update-listeners.js 在目标实例上添加事件监听 
 initRender --src/core/instance/render.js 初始化渲染
-  
+  -> resolveSlots --src/core/instance/render-helpers/resolve-slots.js 解析处理slot
+     createElement --src/core/vdom/create-element.js 创建虚拟DOM元素
+     emptyObject -- src/shared/util.js 被冻结的空对象
+     defineReative --src/core/observer/index.js 为对象定义响应属性
+     isUpdatingChildComponent --src/core/instance/lifecycle.js 判断updateChildComponent函数是否在执行中
+
+
 知识点
 1.任何组件都可以隐式使用keep-alive等内置资源，是因为在子组件或new实例初始化时，
   资源（components/directives/filters）选项合并了Vue构造函数options静态属性。
