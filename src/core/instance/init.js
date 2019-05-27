@@ -75,6 +75,8 @@ export function initMixin (Vue: Class<Component>) {
            vm//当前Vue实例
          )
       */
+     /* Vue实例属性$options(API),暴露给开发者
+     */
       vm.$options = mergeOptions(
         resolveConstructorOptions(vm.constructor),
         options || {},

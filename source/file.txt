@@ -90,6 +90,8 @@ mergeOptions 选项合并
 
        provide
 
+
+知识点
 1.任何组件都可以隐式使用keep-alive等内置资源，是因为在子组件或new实例初始化时，
   资源（components/directives/filters）选项合并了Vue构造函数options静态属性。
   代码见src/core/util/options.js -mergeOptions-mergeAssets
