@@ -103,6 +103,7 @@ export function toNumber (val: string): number | string {
  * Make a map and return a function for checking if a key
  * is in that map.
  */
+/* 字符串转对象，并返回一个函数，函数最终结果判定某个值是否在转换后的对象内 */
 export function makeMap (
   str: string,
   expectsLowerCase?: boolean

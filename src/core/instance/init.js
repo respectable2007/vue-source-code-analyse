@@ -75,7 +75,7 @@ export function initMixin (Vue: Class<Component>) {
            vm//当前Vue实例
          )
       */
-     /* Vue实例属性$options(API),暴露给开发者
+     /* Vue实例属性$options(实例初始化选项API),暴露给开发者
      */
       vm.$options = mergeOptions(
         resolveConstructorOptions(vm.constructor),
@@ -84,6 +84,8 @@ export function initMixin (Vue: Class<Component>) {
       )
     }
     /* istanbul ignore else */
+    /* 在Vue实例对象上添加_renderProxy属性 */
+    /* 非生产环境 */
     if (process.env.NODE_ENV !== 'production') {
       initProxy(vm)
     } else {

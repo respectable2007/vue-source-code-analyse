@@ -44,7 +44,7 @@ mergeOptions 选项合并
 
   normalizeDirectives 格式化Directives属性
 
-->合并
+->选项合并
     mergeField 选择不同策略进行选项合并
     hasOwn -- src/shared/util 判断对象是否含有某个实例属性
     defaultStrat 默认选项合并策略
@@ -90,7 +90,16 @@ mergeOptions 选项合并
 
        provide
 
-
+->渲染函数作用域代理，为了在开发阶段给提示
+   -> initProxy --src/core/instance/proxy Vue实例对象添加_renderProxy，代理Vue实例对象
+      -> hasProxy 宿主环境js是否支持原生Proxy
+         hasHandler 代理拦截has行为
+         -> allowedGlobals 判定关键字是否在指定的字符串内
+            warnReservedPrefix 方法或属性在data中存在，但实例对象中不存在，发出警告
+            warnNonPresent  警告，关键字不存在于data和实例对象，发出警告
+         getHandler 代理拦截get行为
+         -> warnReservedPrefix 方法或属性在data中存在，但实例对象中不存在，发出警告
+            warnNonPresent  警告，关键字不存在于data和实例对象，发出警告
 知识点
 1.任何组件都可以隐式使用keep-alive等内置资源，是因为在子组件或new实例初始化时，
   资源（components/directives/filters）选项合并了Vue构造函数options静态属性。
