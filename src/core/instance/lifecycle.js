@@ -18,6 +18,7 @@ import {
   invokeWithErrorHandling
 } from '../util/index'
 
+/* activeInstance保存当前正在渲染的实例的引用 */
 export let activeInstance: any = null
 export let isUpdatingChildComponent: boolean = false
 
@@ -33,17 +34,24 @@ export function initLifecycle (vm: Component) {
   const options = vm.$options
 
   // locate first non-abstract parent
+  /* options.parent：指向当前正在渲染的实例 */
   let parent = options.parent
+  /* 存在父实例，且为非抽象 */
   if (parent && !options.abstract) {
+    /* while遍历得到第一个非抽象父实例，并作为当前实例的父实例 */
     while (parent.$options.abstract && parent.$parent) {
       parent = parent.$parent
     }
+    /* 当前实例添加入父实例的$children */
     parent.$children.push(vm)
   }
-
+  
+  /* 当前实例$parent指向父实例 */
   vm.$parent = parent
+  /* 父实例存在，$root指向父实例的$root，否则指向它本身 */
   vm.$root = parent ? parent.$root : vm
 
+  /* 添加一些属性 */
   vm.$children = []
   vm.$refs = {}
 

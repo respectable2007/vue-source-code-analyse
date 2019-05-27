@@ -22,12 +22,8 @@ Vue构造函数寻找路径
 
 
 core/instance/init.js
-->
-  mark/measure -- core/util/perf.js 计算性能
-  mergeOptions -- core/util/options.js 选项合并
-
-core/util/options.js
-mergeOptions 选项合并
+mark/measure -- core/util/perf.js 计算性能
+mergeOptions -- core/util/options.js 选项合并
 ->规范化
   checkComponents + validateComponentName 验证注册组件名称是否合法
   -> isBuiltInTag -- src/shared/util 判断注册组件是否为Vue的内置标签（slot、component）
@@ -90,18 +86,22 @@ mergeOptions 选项合并
 
        provide
 
-->渲染函数作用域代理，为了在开发阶段给提示
-   -> initProxy --src/core/instance/proxy Vue实例对象添加_renderProxy，代理Vue实例对象
-      -> hasProxy 宿主环境js是否支持原生Proxy
-         hasHandler 代理拦截has行为
-         -> allowedGlobals 判定关键字是否在指定的字符串内
-            warnReservedPrefix 方法或属性在data中存在，但实例对象中不存在，发出警告
-            warnNonPresent  警告，关键字不存在于data和实例对象，发出警告
-         getHandler 代理拦截get行为
-         -> warnReservedPrefix 方法或属性在data中存在，但实例对象中不存在，发出警告
-            warnNonPresent  警告，关键字不存在于data和实例对象，发出警告
+initProxy --src/core/instance/proxy.js Vue实例对象添加_renderProxy，代理Vue实例对象，渲染函数作用域代理，为了在开发阶段给提示
+-> hasProxy 宿主环境js是否支持原生Proxy
+   hasHandler 代理拦截has行为
+   -> allowedGlobals 判定关键字是否在指定的字符串内
+      warnReservedPrefix 方法或属性在data中存在，但实例对象中不存在，发出警告
+      warnNonPresent  警告，关键字不存在于data和实例对象，发出警告
+   getHandler 代理拦截get行为
+   -> warnReservedPrefix 方法或属性在data中存在，但实例对象中不存在，发出警告
+      warnNonPresent  警告，关键字不存在于data和实例对象，发出警告
+initLifecycle --src/core/instance/lifecycle.js 初始化生命周期
+
 知识点
 1.任何组件都可以隐式使用keep-alive等内置资源，是因为在子组件或new实例初始化时，
   资源（components/directives/filters）选项合并了Vue构造函数options静态属性。
   代码见src/core/util/options.js -mergeOptions-mergeAssets
-2.
+2.Vue自动检测父级实例
+3.抽象组件：一般不渲染真实的DOM，且不会出现在DOM渲染时父子关系路径上（即不能做父
+  级实例），但可以提供一些特殊的功能，例如keep-alive、transition。
+4.
