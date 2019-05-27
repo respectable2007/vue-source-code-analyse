@@ -96,7 +96,11 @@ initProxy --src/core/instance/proxy.js Vue实例对象添加_renderProxy，代�
    -> warnReservedPrefix 方法或属性在data中存在，但实例对象中不存在，发出警告
       warnNonPresent  警告，关键字不存在于data和实例对象，发出警告
 initLifecycle --src/core/instance/lifecycle.js 初始化生命周期
-
+initEvents --src/core/instance/events.js 初始化事件
+  -> updateComponenetListeners 更新组件事件监听
+    -> updateListeners --src/core/vdom/helpers/update-listeners.js 在目标实例上添加事件监听 
+initRender --src/core/instance/render.js 初始化渲染
+  
 知识点
 1.任何组件都可以隐式使用keep-alive等内置资源，是因为在子组件或new实例初始化时，
   资源（components/directives/filters）选项合并了Vue构造函数options静态属性。
