@@ -35,6 +35,7 @@ const sharedPropertyDefinition = {
   set: noop
 }
 
+/* data属性以访问器形式挂载在当前Vue实例的_data上，即vm._data为真正的数据对象 */
 export function proxy (target: Object, sourceKey: string, key: string) {
   sharedPropertyDefinition.get = function proxyGetter () {
     return this[sourceKey][key]
@@ -111,9 +112,13 @@ function initProps (vm: Component, propsOptions: Object) {
 
 function initData (vm: Component) {
   let data = vm.$options.data
+  /* mergeOptions后data肯定是一个函数，还需要data类型判断，是因为beforeCreate在mergeOptions后
+    initData前，beforeCreate可能修改vm.$options.data
+  */
   data = vm._data = typeof data === 'function'
     ? getData(data, vm)
     : data || {}
+  /* 保证data是一个纯对象，不是则警告 */
   if (!isPlainObject(data)) {
     data = {}
     process.env.NODE_ENV !== 'production' && warn(
@@ -129,6 +134,10 @@ function initData (vm: Component) {
   let i = keys.length
   while (i--) {
     const key = keys[i]
+    /* 因为data、methods、props都会挂载在vm实例上，引用会重复。
+       所以，data属性不能与method、props重名
+       props优先级 > data优先级 > methods优先级。
+    */
     if (process.env.NODE_ENV !== 'production') {
       if (methods && hasOwn(methods, key)) {
         warn(
@@ -143,6 +152,7 @@ function initData (vm: Component) {
         `Use prop default value instead.`,
         vm
       )
+    /* 防止与Vue自身属性和方法冲突，排除以$/_为开头的属性 */
     } else if (!isReserved(key)) {
       proxy(vm, `_data`, key)
     }
@@ -151,6 +161,7 @@ function initData (vm: Component) {
   observe(data, true /* asRootData */)
 }
 
+/* 获取选项合并后data函数的执行结果 */
 export function getData (data: Function, vm: Component): any {
   // #7573 disable dep collection when invoking data getters
   pushTarget()

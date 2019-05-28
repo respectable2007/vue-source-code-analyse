@@ -87,14 +87,14 @@ mergeOptions -- core/util/options.js 选项合并
        provide
 
 initProxy --src/core/instance/proxy.js Vue实例对象添加_renderProxy，代理Vue实例对象，渲染函数作用域代理，为了在开发阶段给提示
--> hasProxy 宿主环境js是否支持原生Proxy
-   hasHandler 代理拦截has行为
-   -> allowedGlobals 判定关键字是否在指定的字符串内
-      warnReservedPrefix 方法或属性在data中存在，但实例对象中不存在，发出警告
-      warnNonPresent  警告，关键字不存在于data和实例对象，发出警告
-   getHandler 代理拦截get行为
-   -> warnReservedPrefix 方法或属性在data中存在，但实例对象中不存在，发出警告
-      warnNonPresent  警告，关键字不存在于data和实例对象，发出警告
+   -> hasProxy 宿主环境js是否支持原生Proxy
+      hasHandler 代理拦截has行为
+      -> allowedGlobals 判定关键字是否在指定的字符串内
+         warnReservedPrefix 方法或属性在data中存在，但实例对象中不存在，发出警告
+         warnNonPresent  警告，关键字不存在于data和实例对象，发出警告
+      getHandler 代理拦截get行为
+      -> warnReservedPrefix 方法或属性在data中存在，但实例对象中不存在，发出警告
+         warnNonPresent  警告，关键字不存在于data和实例对象，发出警告
 initLifecycle --src/core/instance/lifecycle.js 初始化生命周期
 initEvents --src/core/instance/events.js 初始化事件
   -> updateComponenetListeners 更新组件事件监听
@@ -110,6 +110,12 @@ initState --src/core/instance/state.js 初始化数据响应系统
   -> initProps
      initMethods
      initData
+       -> getData  执行选项合并后data函数，并返回执行结果
+          isReserved --src/core/util/lang.js 判断字符串是否以$/_为开头
+          proxy data属性以访问器形式挂载在当前Vue实例的_data上
+            -> noop --src/shared/util 空函数
+          observe --src/core/observer/index.js 将data转为响应式的
+            -> 
      initComputed
      initWatch
 
