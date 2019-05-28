@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Vue响应系统基本思路</title>
+  </head>
+  <body>
+    <script type="text/javascript">
+    (function() {
+      var data = {
+        a: 1,
+        b: {
+          c: 2
+        }
+      }
+      
+      var target = null,
+          toString = Object.prototype.toString;
+      function walk(data) {
+        for(var i in data) {
+          /* 嵌套对象 */
+          if(toString.call(data[i]) === '[object Object]') {
+            walk(data[i]);
+          }
+          (function(value) {
+            var deps = []
+            Object.defineProperty(data, i, {
+              get: function() {
+                if(typeof target !== null) {
+                  deps.push(target)
+                }
+                return value
+              },
+              set: function(newVal) {
+                if(newVal === value) return
+                deps.forEach(function(fn) {
+                  fn()
+                })
+                value = newVal
+              }
+            })
+          })(data[i])
+        }
+      }
+      walk(data);
+      /* 观测字段，进而触发get函数，收集依赖（fn） */
+      function $watch(key, fn) {
+        target = fn
+        if(typeof key === 'function') {
+          key()
+          return
+        }
+        if(/\./.test(key)) {
+          var arrs = key.split('.'),
+              obj = data;
+          arrs.forEach(function(item) {
+            obj = obj[item]
+          })
+          return
+        }
+        data[key]
+      }
+      /* 注册字段响应 */
+      $watch('a', function() {
+        console.log('aa')
+      })
+      $watch('b.c', function() {
+        console.log('bc')
+      })
+      /* 触发setter */
+      data.a = 'a'
+      data.b.c = 'bcc'
+      /* 若fn中与DOM相关，那么与Vue响应系统基本一致，
+         在getter收集依赖，在setter触发依赖，进而更新DOM（视图）
+      */
+    })()
+    </script>
+  </body>
+</html>
