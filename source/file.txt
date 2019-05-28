@@ -115,7 +115,17 @@ initState --src/core/instance/state.js 初始化数据响应系统
           proxy data属性以访问器形式挂载在当前Vue实例的_data上
             -> noop --src/shared/util 空函数
           observe --src/core/observer/index.js 将data转为响应式的
-            -> 
+            -> isServerRendering --src/core/util/env.js 判断是否为服务器端渲染
+               Observer --src/core/observe/index.js Observer构造函数
+               -> def --src/core/util/lang.js 对象添加一个属性，该属性不可枚举
+                  hasProto --src/core/util/env.js 判断对象实例是否可使用__proto__
+                  arrayMethods --src/core/observe/array.js 以Array为原型的对象实例
+                  protoAugment 更改某个对象实例的原型
+                  copyAugment 对象或数组添加一些不可枚举的属性或方法
+                  observeArray 
+                  walk
+                    ->defineReative 数据对象的数据属性转为访问器属性
+
      initComputed
      initWatch
 
@@ -127,3 +137,25 @@ initState --src/core/instance/state.js 初始化数据响应系统
 3.抽象组件：一般不渲染真实的DOM，且不会出现在DOM渲染时父子关系路径上（即不能做父
   级实例），但可以提供一些特殊的功能，例如keep-alive、transition。
 4.
+data = {
+   a: {     => enumerable: true,configurable: true, get:     set:
+     b: 1,
+     __ob__: {
+        value: {
+          b: 1
+        },
+        dep: Dep实例对象,
+        vmCount: 0,
+     }
+   },
+   __ob__: {
+      value: {
+         a: {
+            b: 1
+         }
+      },
+     dep: Dep实例对象,
+     vmCount: 0,
+   }
+
+}

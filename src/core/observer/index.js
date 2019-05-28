@@ -44,13 +44,19 @@ export class Observer {
     this.value = value
     this.dep = new Dep()
     this.vmCount = 0
+    /* 数据对象添加__ob__属性，其值为Observer实例对象 */
     def(value, '__ob__', this)
+    /* 数组 */
     if (Array.isArray(value)) {
+      /* 保证data可使用Array原生方法 */
       if (hasProto) {
+        /* 数据对象实例原型指向Array */
         protoAugment(value, arrayMethods)
       } else {
+        /* 数据对象添加Array的原型属性和方法 */
         copyAugment(value, arrayMethods, arrayKeys)
       }
+      /* 遍历观察数组项，观察对象，不观察基本数据类型 */
       this.observeArray(value)
     } else {
       this.walk(value)
@@ -85,6 +91,7 @@ export class Observer {
  * Augment a target Object or Array by intercepting
  * the prototype chain using __proto__
  */
+/* 更改某个对象实例的原型 */
 function protoAugment (target, src: Object) {
   /* eslint-disable no-proto */
   target.__proto__ = src
@@ -109,10 +116,12 @@ function copyAugment (target: Object, src: Object, keys: Array<string>) {
  * or the existing observer if the value already has one.
  */
 export function observe (value: any, asRootData: ?boolean): Observer | void {
+  /* 不为对象或是VNode的实例，则不能被观测 */
   if (!isObject(value) || value instanceof VNode) {
     return
   }
   let ob: Observer | void
+  /* 若一个数据对象包含__ob__属性，且该属性为Observer实例，那么说明这个数据对象已经被观测过 */
   if (hasOwn(value, '__ob__') && value.__ob__ instanceof Observer) {
     ob = value.__ob__
   } else if (
@@ -120,8 +129,9 @@ export function observe (value: any, asRootData: ?boolean): Observer | void {
     !isServerRendering() &&
     (Array.isArray(value) || isPlainObject(value)) &&
     Object.isExtensible(value) &&
-    !value._isVue
+    !value._isVue//避免Vue实例对象被观察
   ) {
+    /* 将数据对象转为响应式数据 */
     ob = new Observer(value)
   }
   if (asRootData && ob) {
@@ -133,6 +143,7 @@ export function observe (value: any, asRootData: ?boolean): Observer | void {
 /**
  * Define a reactive property on an Object.
  */
+/* 数据对象的数据属性转为访问器属性 */
 export function defineReactive (
   obj: Object,
   key: string,
@@ -140,20 +151,33 @@ export function defineReactive (
   customSetter?: ?Function,
   shallow?: boolean
 ) {
+  /* 保存当前字段的依赖 */
   const dep = new Dep()
 
   const property = Object.getOwnPropertyDescriptor(obj, key)
+  /* 排除不能配置的对象属性，是因为不可配置的对象属性，
+     没必要使用Object.defineProperty，改变其特性
+ */
   if (property && property.configurable === false) {
     return
   }
 
+  /* 保存原有的访问器属性，在新建的getter/setter调用，
+     保证对象属性原始的读写操作
+  */
   // cater for pre-defined getter/setters
   const getter = property && property.get
   const setter = property && property.set
+  /* getter不存在或只存在setter，即只能写入时；
+     且函数传入2个参数时，获取key对应的属性值
+   */
   if ((!getter || setter) && arguments.length === 2) {
     val = obj[key]
   }
-
+  /* 前提：val是否被读取
+     当出现嵌套对象（属性值为对象）时，是否需要深度观测，
+     Vue默认为深度观测
+  */
   let childOb = !shallow && observe(val)
   Object.defineProperty(obj, key, {
     enumerable: true,
