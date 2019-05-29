@@ -158,6 +158,7 @@ function initData (vm: Component) {
     }
   }
   // observe data
+  /* data转换为响应数据 */
   observe(data, true /* asRootData */)
 }
 

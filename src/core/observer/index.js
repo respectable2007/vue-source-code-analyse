@@ -246,21 +246,25 @@ export function defineReactive (
  * already exist.
  */
 export function set (target: Array<any> | Object, key: any, val: any): any {
+  /* 非生产环境，target为undefined或null或基本数据类型，警告 */
   if (process.env.NODE_ENV !== 'production' &&
     (isUndef(target) || isPrimitive(target))
   ) {
     warn(`Cannot set reactive property on undefined, null, or primitive value: ${(target: any)}`)
   }
+  /* 数组，使用splice方法（变异方法可触发依赖），触发依赖 */
   if (Array.isArray(target) && isValidArrayIndex(key)) {
     target.length = Math.max(target.length, key)
     target.splice(key, 1, val)
     return val
   }
+  /* 对象，通过setter函数，触发依赖 */
   if (key in target && !(key in Object.prototype)) {
     target[key] = val
     return val
   }
   const ob = (target: any).__ob__
+  /* 不能在Vue实例、根级数据对象添加，否则在非生产环境，警告 */
   if (target._isVue || (ob && ob.vmCount)) {
     process.env.NODE_ENV !== 'production' && warn(
       'Avoid adding reactive properties to a Vue instance or its root $data ' +
@@ -268,12 +272,16 @@ export function set (target: Array<any> | Object, key: any, val: any): any {
     )
     return val
   }
+  /* 若target原本非响应，直接赋值，并返回值 */
   if (!ob) {
     target[key] = val
     return val
   }
+  /* target被观测，新添加的属性转为响应式 */
   defineReactive(ob.value, key, val)
+  /* 触发target依赖 */
   ob.dep.notify()
+  /* 返回值 */
   return val
 }
 
@@ -286,11 +294,13 @@ export function del (target: Array<any> | Object, key: any) {
   ) {
     warn(`Cannot delete reactive property on undefined, null, or primitive value: ${(target: any)}`)
   }
+  /* 在数组内，删除 */
   if (Array.isArray(target) && isValidArrayIndex(key)) {
     target.splice(key, 1)
     return
   }
   const ob = (target: any).__ob__
+  /* Vue实例和根级数据对象不可删除 */
   if (target._isVue || (ob && ob.vmCount)) {
     process.env.NODE_ENV !== 'production' && warn(
       'Avoid deleting properties on a Vue instance or its root $data ' +
@@ -298,13 +308,17 @@ export function del (target: Array<any> | Object, key: any) {
     )
     return
   }
+  /* 不在target里，直接返回 */
   if (!hasOwn(target, key)) {
     return
   }
+  /* 对象删除 */
   delete target[key]
+  /* target非响应，直接返回 */
   if (!ob) {
     return
   }
+  /* target响应，触发依赖 */
   ob.dep.notify()
 }
 
@@ -312,7 +326,7 @@ export function del (target: Array<any> | Object, key: any) {
  * Collect dependencies on array elements when the array is touched, since
  * we cannot intercept array element access like property getters.
  */
-/* 递归遍历数组及其内部数组项，收集依赖，保证集合与集合项行为一致 */
+/* 递归遍历数组及其内部数组项，收集依赖，保证集合与集合项行为一致，仅仅针对对象或数组 */
 function dependArray (value: Array<any>) {
   for (let e, i = 0, l = value.length; i < l; i++) {
     e = value[i]

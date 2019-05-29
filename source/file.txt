@@ -109,7 +109,7 @@ callHook --src/core/instance/lifecycle.js 执行生命周期钩子对应的函�
 initState --src/core/instance/state.js 初始化数据响应系统
   -> initProps
      initMethods
-     initData
+     initData 判断是否重名，将data选项转换为响应式数据
        -> getData  执行选项合并后data函数，并返回执行结果
           isReserved --src/core/util/lang.js 判断字符串是否以$/_为开头
           proxy data属性以访问器形式挂载在当前Vue实例的_data上
@@ -131,6 +131,18 @@ initState --src/core/instance/state.js 初始化数据响应系统
      initComputed
      initWatch
 
+src/core/instance/state.js
+stateMixin
+Vue.prototype.$set = set 为对象或数组添加响应式属性
+(Vue.set = set，与全局set配置行为一致)
+  -> set --src/core/observe/index.js 
+       -> isValidArrayIndex --src/shared/util.js 是否为有效的索引
+Vue.prototype.$delete = del 为对象或数组删除响应式属性
+(Vue.delete = del，与全局del配置行为一致)
+  -> del --src/core/observe/index.js 
+       -> isValidArrayIndex --src/shared/util.js 是否为有效的索引
+
+
 知识点
 1.任何组件都可以隐式使用keep-alive等内置资源，是因为在子组件或new实例初始化时，
   资源（components/directives/filters）选项合并了Vue构造函数options静态属性。
@@ -148,9 +160,11 @@ initState --src/core/instance/state.js 初始化数据响应系统
      ...
      sayHi()
   }
-6.Vue.set/vm.$set不能在根级数据对象（data选项）或Vue实例上添加响应式属性
+6.Vue.set/vm.$set不能在根级数据对象（data选项）或Vue实例上添加响应式属性，是因为
+  data收集不到新添加属性的依赖，即使添加了，也无法被观测
 7.集合类型数据，被观察，其内部数据项也会被观察，是因为任意数据项改变，会造成集合类
   型发生改变，进而触发依赖。
   集合类型数据与其数据项收集同一依赖
-8.对于数组，例如arr[0]/arr[0] = 1,不是响应的，是因为索引不是响应的
+8.对于数组，例如arr[0]/arr[0] = 1,不是响应的，是因为索引不是响应的。
+  可通过vm.$set(arr,0,1)，触发响应
 9.Vue.set/vm.$set可使Vue拦截一个对象或数组添加元素或属性的行为
