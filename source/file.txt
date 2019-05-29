@@ -120,11 +120,13 @@ initState --src/core/instance/state.js 初始化数据响应系统
                -> def --src/core/util/lang.js 对象添加一个属性，该属性不可枚举
                   hasProto --src/core/util/env.js 判断对象实例是否可使用__proto__
                   arrayMethods --src/core/observe/array.js 以Array为原型的对象实例
+                    -> 重写push pop shift unshift splice reverse sort方法
                   protoAugment 更改某个对象实例的原型
                   copyAugment 对象或数组添加一些不可枚举的属性或方法
                   observeArray 
                   walk
-                    ->defineReative 数据对象的数据属性转为访问器属性
+                    -> defineReative 数据对象的数据属性转为访问器属性
+                       dependArray --src/core/observer/index.js 递归遍历数据，收集依赖
 
      initComputed
      initWatch
@@ -136,26 +138,19 @@ initState --src/core/instance/state.js 初始化数据响应系统
 2.Vue自动检测父级实例
 3.抽象组件：一般不渲染真实的DOM，且不会出现在DOM渲染时父子关系路径上（即不能做父
   级实例），但可以提供一些特殊的功能，例如keep-alive、transition。
-4.
-data = {
-   a: {     => enumerable: true,configurable: true, get:     set:
-     b: 1,
-     __ob__: {
-        value: {
-          b: 1
-        },
-        dep: Dep实例对象,
-        vmCount: 0,
-     }
-   },
-   __ob__: {
-      value: {
-         a: {
-            b: 1
-         }
-      },
-     dep: Dep实例对象,
-     vmCount: 0,
-   }
-
-}
+4.data选项某个属性的值为嵌套对象，且该属性有getter函数无setter函数，是不会对嵌套
+  对象深度观测的，即watch挂载的观测依赖不生效
+5.在不改变函数代码的情况下，对其扩展的小技巧：保存原函数，在重写原函数，并在重写后
+  函数调用原函数
+  function say(){}
+  var sayHi = say
+  say = function() {
+     ...
+     sayHi()
+  }
+6.Vue.set/vm.$set不能在根级数据对象（data选项）或Vue实例上添加响应式属性
+7.集合类型数据，被观察，其内部数据项也会被观察，是因为任意数据项改变，会造成集合类
+  型发生改变，进而触发依赖。
+  集合类型数据与其数据项收集同一依赖
+8.对于数组，例如arr[0]/arr[0] = 1,不是响应的，是因为索引不是响应的
+9.Vue.set/vm.$set可使Vue拦截一个对象或数组添加元素或属性的行为

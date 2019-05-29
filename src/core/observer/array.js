@@ -21,12 +21,14 @@ const methodsToPatch = [
 /**
  * Intercept mutating methods and emit events
  */
+/* 重写Array变异方法，触发依赖 */
 methodsToPatch.forEach(function (method) {
   // cache original method
   const original = arrayProto[method]
   def(arrayMethods, method, function mutator (...args) {
     const result = original.apply(this, args)
     const ob = this.__ob__
+    /* 新增元素转换为响应式 */
     let inserted
     switch (method) {
       case 'push':
@@ -39,6 +41,7 @@ methodsToPatch.forEach(function (method) {
     }
     if (inserted) ob.observeArray(inserted)
     // notify change
+    /* 触发依赖 */
     ob.dep.notify()
     return result
   })

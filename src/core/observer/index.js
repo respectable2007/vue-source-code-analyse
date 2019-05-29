@@ -48,15 +48,19 @@ export class Observer {
     def(value, '__ob__', this)
     /* 数组 */
     if (Array.isArray(value)) {
-      /* 保证data可使用Array原生方法 */
+      /* value挂载被重写过的原型对象
+         该原型对象指向Array原型，
+         其数组变异方法被重写，触发依赖，
+         供开发者获得数组发生改变的信息
+      */
       if (hasProto) {
-        /* 数据对象实例原型指向Array */
+        /* 数据对象实例原型指向一个对象（包含Array原型） */
         protoAugment(value, arrayMethods)
       } else {
         /* 数据对象添加Array的原型属性和方法 */
         copyAugment(value, arrayMethods, arrayKeys)
       }
-      /* 遍历观察数组项，观察对象，不观察基本数据类型 */
+      /* 遍历观察数组项，观察对象或数组，不观察基本数据类型 */
       this.observeArray(value)
     } else {
       this.walk(value)
@@ -168,13 +172,17 @@ export function defineReactive (
   // cater for pre-defined getter/setters
   const getter = property && property.get
   const setter = property && property.set
-  /* getter不存在或只存在setter，即只能写入时；
-     且函数传入2个参数时，获取key对应的属性值
+  /* val是defineReactive的第三个参数，在walk函数中，
+     未传入该参数，此时为undefined。
+     但后期Object.defineProperty需要这个值。因此，
+     在getter不存在或只存在setter，
+     且函数传入2个参数时，获取key对应的属性值。
+     此外，也保证属性getter存在时，初始化时该函数不会被触发
    */
   if ((!getter || setter) && arguments.length === 2) {
     val = obj[key]
   }
-  /* 前提：val是否被读取
+  /* 前提：val是否被读取，val是undefined，不会深度观测
      当出现嵌套对象（属性值为对象）时，是否需要深度观测，
      Vue默认为深度观测
   */
@@ -188,9 +196,10 @@ export function defineReactive (
       /* Dep.target要收集的依赖（观察者） */
       if (Dep.target) {
         dep.depend() //收集依赖
-        /* 嵌套对象收集依赖，用来实现Vue.set或$set在嵌套对象上添加属性是响应的 */
+        /* 用来实现Vue.set或$set在嵌套对象上添加属性是响应的 */
         if (childOb) {
           childOb.dep.depend()
+          /* 该属性为数组属性 */
           if (Array.isArray(value)) {
             dependArray(value)
           }
@@ -303,6 +312,7 @@ export function del (target: Array<any> | Object, key: any) {
  * Collect dependencies on array elements when the array is touched, since
  * we cannot intercept array element access like property getters.
  */
+/* 递归遍历数组及其内部数组项，收集依赖，保证集合与集合项行为一致 */
 function dependArray (value: Array<any>) {
   for (let e, i = 0, l = value.length; i < l; i++) {
     e = value[i]
