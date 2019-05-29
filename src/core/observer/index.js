@@ -182,10 +182,13 @@ export function defineReactive (
   Object.defineProperty(obj, key, {
     enumerable: true,
     configurable: true,
+    /* 1、返回属性值；2、收集依赖 */
     get: function reactiveGetter () {
       const value = getter ? getter.call(obj) : val
+      /* Dep.target要收集的依赖（观察者） */
       if (Dep.target) {
-        dep.depend()
+        dep.depend() //收集依赖
+        /* 嵌套对象收集依赖，用来实现Vue.set或$set在嵌套对象上添加属性是响应的 */
         if (childOb) {
           childOb.dep.depend()
           if (Array.isArray(value)) {
@@ -195,24 +198,34 @@ export function defineReactive (
       }
       return value
     },
+    /* 1、设置新属性值；2、触发依赖 */
     set: function reactiveSetter (newVal) {
       const value = getter ? getter.call(obj) : val
+
       /* eslint-disable no-self-compare */
+      /* 值未变化
+         newVal !== newVal && value !== value =》新值与旧值自身不相等，说明新值与旧值都是NaN
+      */
       if (newVal === value || (newVal !== newVal && value !== value)) {
         return
       }
       /* eslint-enable no-self-compare */
+      /* 输出辅助信息 */
       if (process.env.NODE_ENV !== 'production' && customSetter) {
         customSetter()
       }
       // #7981: for accessor properties without setter
+      /* 只读属性 */
       if (getter && !setter) return
+      /* 设置新属性值 */
       if (setter) {
         setter.call(obj, newVal)
       } else {
         val = newVal
       }
+      /* 为新属性值添加观测 */
       childOb = !shallow && observe(newVal)
+      /* 触发依赖 */
       dep.notify()
     }
   })
