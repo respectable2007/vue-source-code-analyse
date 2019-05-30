@@ -24,7 +24,7 @@ const idToTemplate = cached(id => {
 /* 缓存Vue.$mount实例方法 */
 const mount = Vue.prototype.$mount
 
-/* 重写Vue.$mount方法 */
+/* 重写Vue.$mount方法,是为了给$mount函数添加编译模板的能力 */
 Vue.prototype.$mount = function (
   el?: string | Element,
   hydrating?: boolean
@@ -32,6 +32,7 @@ Vue.prototype.$mount = function (
   el = el && query(el)
 
   /* istanbul ignore if */
+  /* 挂载点不能是body、html元素，否则在非生产环境下，发出警告 */
   if (el === document.body || el === document.documentElement) {
     process.env.NODE_ENV !== 'production' && warn(
       `Do not mount Vue to <html> or <body> - mount to normal elements instead.`
@@ -41,6 +42,8 @@ Vue.prototype.$mount = function (
 
   const options = this.$options
   // resolve template/el and convert to render function
+  /* 解析模板，转为渲染函数 */
+  /* 若无自定义render函数 */
   if (!options.render) {
     let template = options.template
     if (template) {
@@ -89,6 +92,7 @@ Vue.prototype.$mount = function (
       }
     }
   }
+  /* 调用缓存的$mount函数 */
   return mount.call(this, el, hydrating)
 }
 

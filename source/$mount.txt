@@ -1,0 +1,21 @@
+$mount执行顺序
+加载js
+src/core/instance/lifecycle.js
+  mountComponent
+|
+src/platforms/web/runtime/index.js
+  Vue.prototype.$mount = function(){...}
+|
+src/platforms/web/entry-runtime-with-compiler.js
+  const mount = Vue.prototype.$mount
+  Vue.prototype.$mount = function(){...}
+|
+声明一个Vue实例
+src/core/instance/index.js
+  new Vue()
+  调用_init
+  this._init()
+|
+_init方法调用$mount
+src/core/instance/init.js
+  vm.$mount()

@@ -14,6 +14,7 @@ let uid = 0
 
 export function initMixin (Vue: Class<Component>) {
   /*  */
+  
   Vue.prototype._init = function (options?: Object) {
     /* 当前Vue实例对象，即new过程产生的对象 */
     const vm: Component = this
