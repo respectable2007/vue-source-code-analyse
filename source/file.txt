@@ -142,6 +142,12 @@ Vue.prototype.$delete = del 为对象或数组删除响应式属性
   -> del --src/core/observe/index.js 
        -> isValidArrayIndex --src/shared/util.js 是否为有效的索引
 
+mountComponent --src/core/instance/lifecycle.js 
+  -> callHook  执行生命周期钩子对应的函数数组
+     updateComponent 调用vm.$option.render函数生成虚拟DOM，并将虚拟DOM渲染为真正的DOM
+     Watcher --src/core/observer/watcher.js 
+
+
 
 知识点
 1.任何组件都可以隐式使用keep-alive等内置资源，是因为在子组件或new实例初始化时，

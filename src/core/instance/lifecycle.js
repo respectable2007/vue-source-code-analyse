@@ -151,9 +151,17 @@ export function mountComponent (
   el: ?Element,
   hydrating?: boolean
 ): Component {
+  /* Vue实例添加$el属性，其值为el */
+  /* 刚进入这个函数体内，$el指向的是选项option.el
+      若选项option有template，后面会被重写为template
+      内根级元素
+  */
   vm.$el = el
+  /*  */
   if (!vm.$options.render) {
+    /* Vue实例对象render被执行空Vnode */
     vm.$options.render = createEmptyVNode
+    /* 不存在render函数，则在非生产环境，发出警告 */
     if (process.env.NODE_ENV !== 'production') {
       /* istanbul ignore if */
       if ((vm.$options.template && vm.$options.template.charAt(0) !== '#') ||
@@ -172,10 +180,20 @@ export function mountComponent (
       }
     }
   }
+  /* 执行beforeMount生命周期钩子函数 */
   callHook(vm, 'beforeMount')
-
+  
+  /* updateComponent，调用vm.$option.render函数生成虚拟DOM，
+     并将虚拟DOM渲染为真正的DOM
+  */
   let updateComponent
   /* istanbul ignore if */
+  /* 以下if分支，最终是定义updateComponent函数，
+     函数内部是执行vm._update(vm._render(), hydrating)。
+     仅仅是非生产环境下，计算vm._render/vm._update函数性能
+     vm._render：调用vm.$option.render函数并返回虚拟DOM节点
+     vm._update：将虚拟Dom节点渲染为真正的DOM
+  */
   if (process.env.NODE_ENV !== 'production' && config.performance && mark) {
     updateComponent = () => {
       const name = vm._name
@@ -215,6 +233,7 @@ export function mountComponent (
   // mounted is called for render-created child components in its inserted hook
   if (vm.$vnode == null) {
     vm._isMounted = true
+    /* 执行mounted生命周期钩子函数 */
     callHook(vm, 'mounted')
   }
   return vm

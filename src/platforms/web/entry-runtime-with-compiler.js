@@ -24,7 +24,10 @@ const idToTemplate = cached(id => {
 /* 缓存Vue.$mount实例方法 */
 const mount = Vue.prototype.$mount
 
-/* 重写Vue.$mount方法,是为了给$mount函数添加编译模板的能力 */
+/* 重写Vue.$mount方法,是为了给$mount函数添加编译模板的能力
+   其核心是模板编译成渲染函数，将渲染函数挂载在vm.options上，
+   调用mountComponent方法，挂载组件
+*/
 Vue.prototype.$mount = function (
   el?: string | Element,
   hydrating?: boolean
@@ -43,14 +46,24 @@ Vue.prototype.$mount = function (
   const options = this.$options
   // resolve template/el and convert to render function
   /* 解析模板，转为渲染函数 */
-  /* 若无自定义render函数 */
+  /* 若无自定义render函数，使用template、el构建渲染函数 */
   if (!options.render) {
     let template = options.template
+    /* 获取合适的内容作为template选项 */
     if (template) {
+      /* template存在，只能是必须以‘#’为开头的字符串或DOM元素，
+         否则在非生产环境下，发出警告
+      */
       if (typeof template === 'string') {
+        /* template为字符串，必须以‘#’为开头 */
         if (template.charAt(0) === '#') {
+          /* 认为是某个DOM元素的id，根据id，
+             获取这个DOM元素所有子节点的HTML标记，
+             作为template选项
+          */
           template = idToTemplate(template)
           /* istanbul ignore if */
+          /* template为空，则在非生产环境，发出警告 */
           if (process.env.NODE_ENV !== 'production' && !template) {
             warn(
               `Template element not found or is empty: ${options.template}`,
@@ -59,8 +72,10 @@ Vue.prototype.$mount = function (
           }
         }
       } else if (template.nodeType) {
+        /* 取节点的子节点HTML标记，作为template */
         template = template.innerHTML
       } else {
+        /* template不是字符串和dom元素，则在非生产环境下，发出警告 */
         if (process.env.NODE_ENV !== 'production') {
           warn('invalid template option:' + template, this)
         }
@@ -71,10 +86,11 @@ Vue.prototype.$mount = function (
     }
     if (template) {
       /* istanbul ignore if */
+      /* 非生产环境，计算性能 */
       if (process.env.NODE_ENV !== 'production' && config.performance && mark) {
         mark('compile')
       }
-
+      /* 根据模板template，编译为渲染函数render */
       const { render, staticRenderFns } = compileToFunctions(template, {
         outputSourceRange: process.env.NODE_ENV !== 'production',
         shouldDecodeNewlines,
@@ -100,7 +116,7 @@ Vue.prototype.$mount = function (
  * Get outerHTML of elements, taking care
  * of SVG elements in IE as well.
  */
-/* 定义getOuterHTML函数，用于获取元素的outerHTML */
+/* 获取el的HTML标记 */
 function getOuterHTML (el: Element): string {
   if (el.outerHTML) {
     return el.outerHTML
