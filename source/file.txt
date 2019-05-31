@@ -146,7 +146,8 @@ mountComponent --src/core/instance/lifecycle.js
   -> callHook  执行生命周期钩子对应的函数数组
      updateComponent 调用vm.$option.render函数生成虚拟DOM，并将虚拟DOM渲染为真正的DOM
      Watcher --src/core/observer/watcher.js 
-
+       -> parsePath --src/core/util/lang.js 字符串分隔，触发getter，返回一个函数
+       
 
 
 知识点
@@ -175,4 +176,10 @@ mountComponent --src/core/instance/lifecycle.js
   可通过vm.$set(arr,0,1)，触发响应
 9.Vue.set/vm.$set可使Vue拦截一个对象或数组添加元素或属性的行为
 10.挂载点不能是body、html元素，是因为挂载点为组件的占位，将来会被组件的模板替换掉，
-body、html元素显然是不能被替换
+   body、html元素显然是不能被替换
+11.在创建vue观察者实例时，即watch选项或vm.$watch,options可配置五个选项：
+   options.deep 当前观察者实例是否是深度观测
+   options.user 当前观察者实例是开发者定义还是内置的
+   options.lazy 当前观察者实例是否是惰性属性的观察者（如计算属性）
+   options.sync 通知观察者数据发生变化时是否同步求值并执行回调
+   options.before 当数据发生变化之后，触发更新之前，调用before选项

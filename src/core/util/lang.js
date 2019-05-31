@@ -33,15 +33,21 @@ export function def (obj: Object, key: string, val: any, enumerable?: boolean) {
  */
 const bailRE = new RegExp(`[^${unicodeRegExp.source}.$_\\d]`)
 export function parsePath (path: string): any {
+  /* 字符串不能包含html标记、内置组件名称和内置属性名，即
+     不能是<div|a.$|a._|a1这些形式
+  */
   if (bailRE.test(path)) {
     return
   }
   const segments = path.split('.')
+  /* 返回一个函数，这个函数内部触发getter */
   return function (obj) {
+    /* 未传入obj，返回空 */
     for (let i = 0; i < segments.length; i++) {
       if (!obj) return
       obj = obj[segments[i]]
     }
+    /* 返回obj对象 */
     return obj
   }
 }

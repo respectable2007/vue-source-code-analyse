@@ -49,12 +49,18 @@ export default class Watcher {
     options?: ?Object,
     isRenderWatcher?: boolean
   ) {
+    /* 观察实例的vm，指向的是当前的Vue实例 */
     this.vm = vm
+    /* 是否为渲染函数的watcher */
     if (isRenderWatcher) {
+      /* 当前Vue实例属性_watcher指向的是渲染函数观察实例 */
       vm._watcher = this
     }
+    /* 当前Vue实例_watchers数组保存着这个组件实例的渲染函数和非渲染函数观察实例 */
     vm._watchers.push(this)
+
     // options
+    /* 初始化options */
     if (options) {
       this.deep = !!options.deep
       this.user = !!options.user
@@ -64,14 +70,22 @@ export default class Watcher {
     } else {
       this.deep = this.user = this.lazy = this.sync = false
     }
+    /* 回调函数 */
     this.cb = cb
+    /* watcher实例id，唯一标识符 */
     this.id = ++uid // uid for batching
+    /* 当前观察实例是否处于激活状态 */
     this.active = true
+    /* 该属性与lazy保持一致，即只有惰性属性，
+       当前观察者实例的direty为真
+    */
     this.dirty = this.lazy // for lazy watchers
+    /* 与依赖有关，用于避免收集重复依赖和剔除无用依赖 */
     this.deps = []
     this.newDeps = []
     this.depIds = new Set()
     this.newDepIds = new Set()
+    /* 被观察者的描述信息 */
     this.expression = process.env.NODE_ENV !== 'production'
       ? expOrFn.toString()
       : ''
@@ -80,8 +94,10 @@ export default class Watcher {
       this.getter = expOrFn
     } else {
       this.getter = parsePath(expOrFn)
+      /* this.getter为空，说明parsePath解析失败，则在非生产环境下，发出警告 */
       if (!this.getter) {
         this.getter = noop
+        /* expOrFn只能是以点分隔的简单字符串或者一个完整的js函数 */
         process.env.NODE_ENV !== 'production' && warn(
           `Failed watching path: "${expOrFn}" ` +
           'Watcher only accepts simple dot-delimited paths. ' +
@@ -90,6 +106,7 @@ export default class Watcher {
         )
       }
     }
+    /*  */
     this.value = this.lazy
       ? undefined
       : this.get()
