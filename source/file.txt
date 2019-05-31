@@ -125,7 +125,9 @@ initState --src/core/instance/state.js 初始化数据响应系统
                   copyAugment 对象或数组添加一些不可枚举的属性或方法
                   observeArray 
                   walk
-                    -> defineReative 数据对象的数据属性转为访问器属性
+                    -> defineReactive --src/core/observe/index.js 数据对象的数据属性转为访问器属性
+                         -> Dep --src/core/observer/dep.js 
+                              -> depend 添加依赖
                        dependArray --src/core/observer/index.js 递归遍历数据，收集依赖
 
      initComputed
@@ -147,7 +149,14 @@ mountComponent --src/core/instance/lifecycle.js
      updateComponent 调用vm.$option.render函数生成虚拟DOM，并将虚拟DOM渲染为真正的DOM
      Watcher --src/core/observer/watcher.js 
        -> parsePath --src/core/util/lang.js 字符串分隔，触发getter，返回一个函数
-       
+          get 求值，并触发getter
+            -> pushTarget --src/core/observer/dep.js Dep.target赋值
+          cleanupDeps 清空本次求值收集的依赖
+          addDep 收集依赖
+          update 通知变化
+            -> queueWatcher --src/core/observer/scheduler.js 
+
+          run 同步更新变化
 
 
 知识点
@@ -180,6 +189,7 @@ mountComponent --src/core/instance/lifecycle.js
 11.在创建vue观察者实例时，即watch选项或vm.$watch,options可配置五个选项：
    options.deep 当前观察者实例是否是深度观测
    options.user 当前观察者实例是开发者定义还是内置的
-   options.lazy 当前观察者实例是否是惰性属性的观察者（如计算属性）
-   options.sync 通知观察者数据发生变化时是否同步求值并执行回调
+   options.lazy 当前观察者实例是否是惰性属性的观察者（如计算属性），
+                true表示还未求值，false表示已经求过值
+   options.sync 通知观察者数据发生变化时是否同步更新变化
    options.before 当数据发生变化之后，触发更新之前，调用before选项

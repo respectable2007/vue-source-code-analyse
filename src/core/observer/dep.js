@@ -29,7 +29,9 @@ export default class Dep {
   }
 
   depend () {
+    /* $mount函数-》new Watcher-》Dep.target指向一个观察者实例 */
     if (Dep.target) {
+      /* 调用Watcher的实例方法addDep，以Dep对象实例为参数 */
       Dep.target.addDep(this)
     }
   }
@@ -43,6 +45,7 @@ export default class Dep {
       // order
       subs.sort((a, b) => a.id - b.id)
     }
+    /* 遍历与当前依赖相关的观测实例对象，触发update方法 */
     for (let i = 0, l = subs.length; i < l; i++) {
       subs[i].update()
     }

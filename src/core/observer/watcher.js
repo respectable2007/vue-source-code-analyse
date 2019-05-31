@@ -81,11 +81,14 @@ export default class Watcher {
     */
     this.dirty = this.lazy // for lazy watchers
     /* 与依赖有关，用于避免收集重复依赖和剔除无用依赖 */
+    /* newDeps、newDepIds，用来保存本次求值收集的依赖
+       deps、depIds，用来保存上一次求值收集的依赖
+    */
     this.deps = []
     this.newDeps = []
     this.depIds = new Set()
     this.newDepIds = new Set()
-    /* 被观察者的描述信息 */
+    /* 被观察者的描述信息，用于提醒开发者错误 */
     this.expression = process.env.NODE_ENV !== 'production'
       ? expOrFn.toString()
       : ''
@@ -106,7 +109,7 @@ export default class Watcher {
         )
       }
     }
-    /*  */
+    /* 保存被观察目标的值 */
     this.value = this.lazy
       ? undefined
       : this.get()
@@ -115,6 +118,7 @@ export default class Watcher {
   /**
    * Evaluate the getter, and re-collect dependencies.
    */
+  /* 求值，收集依赖 */
   get () {
     pushTarget(this)
     let value
@@ -134,6 +138,7 @@ export default class Watcher {
         traverse(value)
       }
       popTarget()
+      /* 清空本次求值的收集的依赖 */
       this.cleanupDeps()
     }
     return value
@@ -143,11 +148,17 @@ export default class Watcher {
    * Add a dependency to this directive.
    */
   addDep (dep: Dep) {
+    /* Dep实例对象的唯一标识 */
     const id = dep.id
+    /* 添加并去重依赖 */
     if (!this.newDepIds.has(id)) {
       this.newDepIds.add(id)
       this.newDeps.push(dep)
+      /* 多次求值（数据发生变化重新求值的过程）中，
+         避免重复收集依赖 
+      */
       if (!this.depIds.has(id)) {
+        /* 这个依赖被当前观察实例所观察 */
         dep.addSub(this)
       }
     }
@@ -158,12 +169,19 @@ export default class Watcher {
    */
   cleanupDeps () {
     let i = this.deps.length
+    /* 遍历总deps， 总deps中的依赖不在本次保存的依赖中，
+       说明这个依赖与当前观察者实例不存在依赖关系，
+       解除依赖与观察者实例的联系
+    */
     while (i--) {
       const dep = this.deps[i]
       if (!this.newDepIds.has(dep.id)) {
         dep.removeSub(this)
       }
     }
+    /* depIds、deps替换为newDepIds、newDeps
+       newDepIds、newDeps被清空
+    */
     let tmp = this.depIds
     this.depIds = this.newDepIds
     this.newDepIds = tmp
@@ -183,8 +201,10 @@ export default class Watcher {
     if (this.lazy) {
       this.dirty = true
     } else if (this.sync) {
+      /* 同步更新 */
       this.run()
     } else {
+      /* 异步更新 */
       queueWatcher(this)
     }
   }
@@ -195,18 +215,27 @@ export default class Watcher {
    */
   run () {
     if (this.active) {
+      /* 触发setter函数，数值发生变化，需要重新渲染。
+         因此，再次调用当前观察者实例的get方法，进而
+         重新渲染。
+      */
       const value = this.get()
+      /* 渲染函数，this.get->updateComponent,返回值都是undefined，
+        不会执行if语句；而非渲染函数，则会执行if语句
+      */
       if (
         value !== this.value ||
         // Deep watchers and watchers on Object/Arrays should fire even
         // when the value is the same, because the value may
         // have mutated.
+        /* 返回值为对象，value为相同的引用，但其内部属性值可能会发生变化 */
         isObject(value) ||
         this.deep
       ) {
         // set new value
         const oldValue = this.value
         this.value = value
+        /* 执行cb回调函数 */
         if (this.user) {
           try {
             this.cb.call(this.vm, value, oldValue)

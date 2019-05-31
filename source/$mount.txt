@@ -19,3 +19,9 @@ src/core/instance/index.js
 _init方法调用$mount
 src/core/instance/init.js
   vm.$mount()
+     调用mount
+        调用mountComponent
+           创建渲染函数的watcher实例
+              调用this.get
+                 触发求值，收集依赖 dep.depend
+                   
