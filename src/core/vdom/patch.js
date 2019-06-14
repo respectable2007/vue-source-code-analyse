@@ -337,7 +337,8 @@ export function createPatchFunction (backend) {
       nodeOps.setStyleScope(vnode.elm, i)
     }
   }
-
+  
+  /* 新增节点 */
   function addVnodes (parentElm, refElm, vnodes, startIdx, endIdx, insertedVnodeQueue) {
     for (; startIdx <= endIdx; ++startIdx) {
       createElm(vnodes[startIdx], insertedVnodeQueue, parentElm, refElm, false, vnodes, startIdx)
@@ -357,7 +358,8 @@ export function createPatchFunction (backend) {
       }
     }
   }
-
+  
+  /* 删除节点 */
   function removeVnodes (vnodes, startIdx, endIdx) {
     for (; startIdx <= endIdx; ++startIdx) {
       const ch = vnodes[startIdx]
@@ -401,6 +403,7 @@ export function createPatchFunction (backend) {
     }
   }
 
+  /* virtual dom新旧DOM树对比 */
   function updateChildren (parentElm, oldCh, newCh, insertedVnodeQueue, removeOnly) {
     let oldStartIdx = 0
     let newStartIdx = 0
@@ -472,7 +475,8 @@ export function createPatchFunction (backend) {
       removeVnodes(oldCh, oldStartIdx, oldEndIdx)
     }
   }
-
+  
+  /* 判断是否有重复key命名 */
   function checkDuplicateKeys (children) {
     const seenKeys = {}
     for (let i = 0; i < children.length; i++) {
@@ -491,13 +495,15 @@ export function createPatchFunction (backend) {
     }
   }
 
+  /* 判断node在oldCh数组[start,end]区间内是否存在，有返回索引值 */
   function findIdxInOld (node, oldCh, start, end) {
     for (let i = start; i < end; i++) {
       const c = oldCh[i]
       if (isDef(c) && sameVnode(node, c)) return i
     }
   }
-
+  
+  /* 更新节点 */
   function patchVnode (
     oldVnode,
     vnode,
@@ -696,7 +702,8 @@ export function createPatchFunction (backend) {
       return node.nodeType === (vnode.isComment ? 8 : 3)
     }
   }
-
+  
+  /* 返回patch方法，可以访问以上函数 */
   return function patch (oldVnode, vnode, hydrating, removeOnly) {
     if (isUndef(vnode)) {
       if (isDef(oldVnode)) invokeDestroyHook(oldVnode)
