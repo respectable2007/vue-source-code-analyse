@@ -9,19 +9,37 @@ src/platforms/web/runtime/index.js
 src/platforms/web/entry-runtime-with-compiler.js
   const mount = Vue.prototype.$mount
   Vue.prototype.$mount = function(){...}
-|
-声明一个Vue实例
-src/core/instance/index.js
-  new Vue()
-  调用_init
-  this._init()
-|
-_init方法调用$mount
-src/core/instance/init.js
-  vm.$mount()
-     调用mount
-        调用mountComponent
-           创建渲染函数的watcher实例
-              调用this.get
-                 触发求值，收集依赖 dep.depend
-                   
+
+createCompileToFunctionFn src/compiler/to-function.js
+compile src/compiler/create-compiler.js
+baseCompile src/compiler/index.js
+baseOptions src/platforms/web/compiler/options.js
+
+
+声明一个Vue实例,new Vue()
+调用_init,this._init() src/core/instance/index.js 
+调用$mount vm.$mount() src/core/instance/init.js
+web平台，重写vm.$mount，最终伪调用mount，mount其实是Vue.prototype.$mount src/platforms/web/entry-runtime-with-compiler.js
+Vue.prototype.$mount内，调用mountComponent src/platforms/web/runtime/index.js
+mountComponent函数内，创建渲染函数的watcher实例，传入参数：vm,updateComponent,noop,{...},true 
+创建watcher实例中，因为options.lazy为false，因此调用this.get方法，this.get方法内调用了updateComponent函数 src/core/observer/watcher.js
+updateComponent函数内调用vm._update(vm._render(), hydrating) src/core/instance/lifecycle.js
+vm._render是在js加载时，调用renderMixin方法时定义的 src/core/instance/render.js
+  vm._render内部调用vm.$options.render,这个函数是在web平台$mount方法内已经生成（src/platforms/web/entry-runtime-with-compiler.js）
+  src/platforms/web/entry-runtime-with-compiler.js
+  {render, staticRenderFns} 是createCompileToFunctionFn返回的匿名函数被调用的结果
+  这个匿名函数可以访问到compile、baseCompile、baseOptions三个参数
+
+  render是根据compile(template, options)返回值compiled.render，生成一个函数
+  compile函数实际调用baseCompile函数
+  baseCompile函数
+    1、将模板和选项转为ast
+    2、ast优化，检测静态attrs、class、静态dom子树
+    2、通过generate函数，生成render函数的原始字符串和staticRenderFns原始字符串
+  generate函数根据ast和选项生成render和staticRenderFns的原始字符串
+  render函数字符串最终包含_c和实例选项
+  调用render函数，则触发了data的getter，收集依赖,返回VNode对象
+vm._update是在js加载时，调用lifecycleMixin方法时定义的 src/core/instance/lifecycle.js
+
+
+

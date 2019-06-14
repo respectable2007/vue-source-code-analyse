@@ -1,4 +1,4 @@
-/* /src/core/instance目录: 包含Vue构造函数设计相关的代码 */
+  /* /src/core/instance目录: 包含Vue构造函数设计相关的代码 */
 
 import { initMixin } from './init'
 import { stateMixin } from './state'
