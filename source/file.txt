@@ -155,8 +155,9 @@ mountComponent --src/core/instance/lifecycle.js
           addDep 收集依赖
           update 通知变化
             -> queueWatcher --src/core/observer/scheduler.js 
-
           run 同步更新变化
+          同步更新和异步更新最终都会调用get，进而调用updateComponent这个依赖，达到更新视图的目的
+          
 
 
 知识点
