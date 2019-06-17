@@ -63,5 +63,5 @@ Vue.version = '__VERSION__'
 Vue.compile = compileToFunctions
 
 /* Vue实例属性，新增__patch__和$mount */
-Vue.prototype.__patch
+Vue.prototype.__patch__
 Vue.prototype.$mount
