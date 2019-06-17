@@ -40,6 +40,20 @@ vm._render是在js加载时，调用renderMixin方法时定义的 src/core/insta
   render函数字符串最终包含_c和实例选项
   调用render函数，则触发了data的getter，收集依赖,返回VNode对象
 vm._update是在js加载时，调用lifecycleMixin方法时定义的 src/core/instance/lifecycle.js
+  vm._update是调用vm.prototype.__patch__方法，将其返回值替换$el。
+
+Vue.prototype.__patch__(src/platforms/web/runtime/index.js)
+  浏览器，__patch为patch(src/platforms/web/runtime/patch.js)；其他，为空函数
 
 
+patch是createPatchFunction(src/core/vdom/patch.js)的返回值（patch函数），传入参数是nodeOps(src/platforms/web/runtime/node-ops.js)、
+modules是plateformModules(src/platforms/web/runtime/modules/index)和baseModules(src/core/vdom/modules/index)合并后的数组
 
+modules包含create、update和destroy钩子函数
+
+调用nodeOps的tagName方法，获取元素节点标签名
+
+调用createPatchFunction函数，返回patch函数，接收4个参数：oldNode、vnode、hydrating和removeOnly
+
+调用patch函数，若为初始渲染，需要以vm.$el的元素节点生成一个vnode节点，作为旧dom树节点
+若为更新渲染，则调用patchVnode，对比新旧vDom树，并更新vm.elm

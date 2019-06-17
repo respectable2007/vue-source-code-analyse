@@ -68,7 +68,8 @@ function _update (oldVnode, vnode) {
       }
     })
   }
-
+  
+  /* 解除指令 */
   if (!isCreate) {
     for (key in oldDirs) {
       if (!newDirs[key]) {

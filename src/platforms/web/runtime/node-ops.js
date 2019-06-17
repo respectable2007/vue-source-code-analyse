@@ -34,18 +34,22 @@ export function removeChild (node: Node, child: Node) {
   node.removeChild(child)
 }
 
+/* 当前元素添加子节点 */
 export function appendChild (node: Node, child: Node) {
   node.appendChild(child)
 }
 
+/* 获取元素父节点 */
 export function parentNode (node: Node): ?Node {
   return node.parentNode
 }
 
+/* 获取元素的兄弟节点 */
 export function nextSibling (node: Node): ?Node {
   return node.nextSibling
 }
 
+/* 获取元素标签名 */
 export function tagName (node: Element): string {
   return node.tagName
 }

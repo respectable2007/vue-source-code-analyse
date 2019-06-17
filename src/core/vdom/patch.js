@@ -73,6 +73,7 @@ export function createPatchFunction (backend) {
 
   const { modules, nodeOps } = backend
 
+  /* cbs挂载modules里包含的hooks钩子函数 */
   for (i = 0; i < hooks.length; ++i) {
     cbs[hooks[i]] = []
     for (j = 0; j < modules.length; ++j) {
@@ -81,7 +82,8 @@ export function createPatchFunction (backend) {
       }
     }
   }
-
+  
+  /* 创建空vnode节点 */
   function emptyNodeAt (elm) {
     return new VNode(nodeOps.tagName(elm).toLowerCase(), {}, [], undefined, elm)
   }
@@ -269,6 +271,7 @@ export function createPatchFunction (backend) {
     insert(parentElm, vnode.elm, refElm)
   }
 
+  /* 挂载到页面上 */
   function insert (parent, elm, ref) {
     if (isDef(parent)) {
       if (isDef(ref)) {
@@ -344,7 +347,8 @@ export function createPatchFunction (backend) {
       createElm(vnodes[startIdx], insertedVnodeQueue, parentElm, refElm, false, vnodes, startIdx)
     }
   }
-
+  
+  /* 调用destroy钩子函数，销毁事件监听函数、当前实例观察者和子组件 */
   function invokeDestroyHook (vnode) {
     let i, j
     const data = vnode.data
@@ -705,6 +709,7 @@ export function createPatchFunction (backend) {
   
   /* 返回patch方法，可以访问以上函数 */
   return function patch (oldVnode, vnode, hydrating, removeOnly) {
+    /* vnode为undefined或null，表示销毁当前dom */
     if (isUndef(vnode)) {
       if (isDef(oldVnode)) invokeDestroyHook(oldVnode)
       return
@@ -712,13 +717,14 @@ export function createPatchFunction (backend) {
 
     let isInitialPatch = false
     const insertedVnodeQueue = []
-
+    
     if (isUndef(oldVnode)) {
       // empty mount (likely as component), create new root element
       isInitialPatch = true
       createElm(vnode, insertedVnodeQueue)
     } else {
       const isRealElement = isDef(oldVnode.nodeType)
+      /* oldNode是vnode且二者结构相同，则对比vnode，并更新vm.elm */
       if (!isRealElement && sameVnode(oldVnode, vnode)) {
         // patch existing root node
         patchVnode(oldVnode, vnode, insertedVnodeQueue, null, null, removeOnly)
@@ -751,6 +757,7 @@ export function createPatchFunction (backend) {
         }
 
         // replacing existing element
+        /* 待替换的元素节点 */
         const oldElm = oldVnode.elm
         const parentElm = nodeOps.parentNode(oldElm)
 
