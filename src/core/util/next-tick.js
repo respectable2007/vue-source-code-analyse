@@ -97,6 +97,7 @@ export function nextTick (cb?: Function, ctx?: Object) {
       _resolve(ctx)
     }
   })
+  /* 不在更新，则调用timerFunc */
   if (!pending) {
     pending = true
     timerFunc()

@@ -165,25 +165,32 @@ export function queueWatcher (watcher: Watcher) {
   const id = watcher.id
   if (has[id] == null) {
     has[id] = true
+    /* 不在更新，则直接插入queue */
     if (!flushing) {
       queue.push(watcher)
     } else {
+       /* 在更新，则 */
       // if already flushing, splice the watcher based on its id
       // if already past its id, it will be run next immediately.
       let i = queue.length - 1
+      /* index表示正在更新的索引值，i>index则说明queue队列中watcher未更新完，
+         要添加的watcher创建早于队列末尾的watch
+      */
       while (i > index && queue[i].id > watcher.id) {
         i--
       }
+      /* 插入要添加的watcher */
       queue.splice(i + 1, 0, watcher)
     }
     // queue the flush
     if (!waiting) {
       waiting = true
-
+      /* 非生产环境且异步为false，则直接执行flushSchedulerQueue方法 */
       if (process.env.NODE_ENV !== 'production' && !config.async) {
         flushSchedulerQueue()
         return
       }
+      /* 异步（config.async）为true,异步调用*/
       nextTick(flushSchedulerQueue)
     }
   }

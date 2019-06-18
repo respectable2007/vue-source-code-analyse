@@ -77,7 +77,8 @@ notify方法，遍历当前dep依赖对象关联的watcher实例，并触发每�
 Watcher对象(src/core/observer/watcher.js)
 update方法，根据状态，分别触发同步更新（run）和异步更新（queueWatcher）
 run同步更新，调用wathcer.get，再次触发updateComponent
-queueWathcer异步更新，
+queueWathcer异步更新，将当前需要更新的watcher保存到queue，使用nextTick异步更新
+queueWatcher最终也会调用run方法
 
 再次调用updateComponent函数时，当前vm._vnode为上次_render函数生成的vnode对象。因此，此次为更新渲染，
 vm.__patch__函数传入prevVnode（旧vdom）、vnode（新vdom）
@@ -97,3 +98,14 @@ modules包含create、update和destroy钩子函数
 调用nodeOps的tagName方法，获取元素节点标签名
 
 调用createPatchFunction函数，返回patch函数，patch函数接收4个参数：oldNode、vnode、hydrating和removeOnly
+
+nextTick(src/core/util/next-tick.js)
+nextTick：
+1、将传入的cb包裹到一个匿名函数内，推入全局变量callbacks数组内。
+2、不在更新，调用timerFunc，异步执行更新操作
+
+timerFunc：根据浏览器兼容情况，封装的异步函数
+1、Promise；
+2、setTimeout；
+3、setImmediate
+1为微任务；2、3均为宏任务
