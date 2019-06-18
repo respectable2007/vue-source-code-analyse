@@ -456,6 +456,7 @@ export function createPatchFunction (backend) {
         idxInOld = isDef(newStartVnode.key)
           ? oldKeyToIdx[newStartVnode.key]
           : findIdxInOld(newStartVnode, oldCh, oldStartIdx, oldEndIdx)
+        /* oldNode内无，表示有新元素 */
         if (isUndef(idxInOld)) { // New element
           createElm(newStartVnode, insertedVnodeQueue, parentElm, oldStartVnode.elm, false, newCh, newStartIdx)
         } else {
@@ -499,7 +500,7 @@ export function createPatchFunction (backend) {
     }
   }
 
-  /* 判断node在oldCh数组[start,end]区间内是否存在，有返回索引值 */
+  /* node没有设置key时，判断node在oldCh数组[start,end]区间内是否存在，有返回索引值 */
   function findIdxInOld (node, oldCh, start, end) {
     for (let i = start; i < end; i++) {
       const c = oldCh[i]
@@ -724,7 +725,7 @@ export function createPatchFunction (backend) {
       createElm(vnode, insertedVnodeQueue)
     } else {
       const isRealElement = isDef(oldVnode.nodeType)
-      /* oldNode是vnode且二者结构相同，则对比vnode，并更新vm.elm */
+      /* oldNode是vnode，二者key值等相同，则对比vnode，并更新vm.elm */
       if (!isRealElement && sameVnode(oldVnode, vnode)) {
         // patch existing root node
         patchVnode(oldVnode, vnode, insertedVnodeQueue, null, null, removeOnly)
