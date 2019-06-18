@@ -155,7 +155,7 @@ export function defineReactive (
   customSetter?: ?Function,
   shallow?: boolean
 ) {
-  /* 保存当前字段的依赖 */
+  /* 创建当前对象属性的依赖 */
   const dep = new Dep()
 
   const property = Object.getOwnPropertyDescriptor(obj, key)
@@ -172,12 +172,17 @@ export function defineReactive (
   // cater for pre-defined getter/setters
   const getter = property && property.get
   const setter = property && property.set
+  /* 主要与深度观测有关，当当前字段是只读的，但其字段值为一个对象或数组，
+     需要进行响应处理，就需要获取其字段值。
+     如果shallow为false但val为undefined，不会深度观测。
+     只有在shallow为false且val不为undefined时，才会深度观测。
+     此时，未重写Object.defineProperty,读取字段值，不会触发依赖等操作
+  */
   /* val是defineReactive的第三个参数，在walk函数中，
      未传入该参数，此时为undefined。
      但后期Object.defineProperty需要这个值。因此，
      在getter不存在或只存在setter，
      且函数传入2个参数时，获取key对应的属性值。
-     此外，也保证属性getter存在时，初始化时该函数不会被触发
    */
   if ((!getter || setter) && arguments.length === 2) {
     val = obj[key]
@@ -185,6 +190,7 @@ export function defineReactive (
   /* 前提：val是否被读取，val是undefined，不会深度观测
      当出现嵌套对象（属性值为对象）时，是否需要深度观测，
      Vue默认为深度观测
+     childOb可能值：undefined|observer实例
   */
   let childOb = !shallow && observe(val)
   Object.defineProperty(obj, key, {
@@ -195,9 +201,10 @@ export function defineReactive (
       const value = getter ? getter.call(obj) : val
       /* Dep.target要收集的依赖（观察者） */
       if (Dep.target) {
-        dep.depend() //收集依赖
+        dep.depend() //当前字段收集依赖
         /* 用来实现Vue.set或$set在嵌套对象上添加属性是响应的 */
         if (childOb) {
+          /* 字段值的observer收集依赖 */
           childOb.dep.depend()
           /* 该属性为数组属性 */
           if (Array.isArray(value)) {

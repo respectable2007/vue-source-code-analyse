@@ -39,6 +39,7 @@ methodsToPatch.forEach(function (method) {
         inserted = args.slice(2)
         break
     }
+    /* 新增元素转为响应数据 */
     if (inserted) ob.observeArray(inserted)
     // notify change
     /* 触发依赖 */
