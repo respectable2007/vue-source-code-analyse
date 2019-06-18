@@ -17,43 +17,83 @@ baseOptions src/platforms/web/compiler/options.js
 
 
 声明一个Vue实例,new Vue()
-调用_init,this._init() src/core/instance/index.js 
-调用$mount vm.$mount() src/core/instance/init.js
-web平台，重写vm.$mount，最终伪调用mount，mount其实是Vue.prototype.$mount src/platforms/web/entry-runtime-with-compiler.js
+调用_init,this._init()(src/core/instance/index.js )
+调用$mount vm.$mount()(src/core/instance/init.js)
+web平台，重写vm.$mount，最终伪调用mount，mount其实是Vue.prototype.$mount(src/platforms/web/entry-runtime-with-compiler.js)
 Vue.prototype.$mount内，调用mountComponent src/platforms/web/runtime/index.js
-mountComponent函数内，创建渲染函数的watcher实例，传入参数：vm,updateComponent,noop,{...},true 
-创建watcher实例中，因为options.lazy为false，因此调用this.get方法，this.get方法内调用了updateComponent函数 src/core/observer/watcher.js
-updateComponent函数内调用vm._update(vm._render(), hydrating) src/core/instance/lifecycle.js
-vm._render是在js加载时，调用renderMixin方法时定义的 src/core/instance/render.js
+mountComponent函数(src/core/instance/lifecycle.js)：
+  1、调用beforeMount钩子函数；
+  2、定义updateComponent函数；
+  3、创建渲染函数的watcher实例，传入参数：vm,updateComponent,noop,{...},true 
+
+创建watcher实例(src/core/observer/watcher.js)中，因为options.lazy为false，因此调用this.get方法。
+this.get方法:
+   1、通过pushTarget方法，推入targetStack栈内，并使当前watcher实例为Dep.target。
+   2、调用了updateComponent函数
+   3、Dep.target回退到上一个watcher实例
+   4、清空本次求值收集（newDepIds和newDeps）的依赖
+
+updateComponent函数(src/core/instance/lifecycle.js)：
+  1、调用vm._render(),返回vnode对象；
+  2、调用vm._update(vm._render()返回值, hydrating)(src/core/instance/lifecycle.js)
+
+vm._render(src/core/instance/render.js)是在js加载时，调用renderMixin方法时定义的
   vm._render内部调用vm.$options.render,这个函数是在web平台$mount方法内已经生成（src/platforms/web/entry-runtime-with-compiler.js）
-  src/platforms/web/entry-runtime-with-compiler.js
+  Vue.prototype.$mount函数，创建了render函数：
   {render, staticRenderFns} 是createCompileToFunctionFn返回的匿名函数被调用的结果
   这个匿名函数可以访问到compile、baseCompile、baseOptions三个参数
 
-  render是根据compile(template, options)返回值compiled.render，生成一个函数
+  render是根据compile(template, options)返回值compiled.render，使用new Function生成的一个函数
   compile函数实际调用baseCompile函数
-  baseCompile函数
+  baseCompile函数做了3件事情：
     1、将模板和选项转为ast
     2、ast优化，检测静态attrs、class、静态dom子树
-    2、通过generate函数，生成render函数的原始字符串和staticRenderFns原始字符串
+    3、通过generate函数，生成render函数的原始字符串和staticRenderFns原始字符串
   generate函数根据ast和选项生成render和staticRenderFns的原始字符串
   render函数字符串最终包含_c和实例选项
-  调用render函数，则触发了data的getter，收集依赖,返回VNode对象
-vm._update是在js加载时，调用lifecycleMixin方法时定义的 src/core/instance/lifecycle.js
-  vm._update是调用vm.prototype.__patch__方法，将其返回值替换$el。
+因此，调用render函数，会访问data选项，进而触发Object.defineProperty的getter。
+getter内又可以调用dep对象的depend方法,收集依赖,返回VNode对象。
 
+Dep对象(src/core/observer/dep.js)
+depend方法，实际调用watcher对象的addDep，收集dep依赖对象
+
+Watcher对象(src/core/observer/watcher.js)
+addDep方法，在newDepIds（本次更新保存的依赖）和depIds（上一次数据更新的依赖）中保存传入的dep依赖对象
+
+vm._update(src/core/instance/lifecycle.js)是在js加载时，调用lifecycleMixin方法时定义的
+  vm._update是调用vm.prototype.__patch__方法，将其返回值替换$el。
+  在初次Vue实例化过程中，_init函数调用了initRender方法，定义并赋值了vm._vnode(vm._vnode = null)。
+  因此，当前vm._vnode为null，进行初始渲染，vm.__patch__函数传入vm.$el, _render返回的vnode对象, hydrating, false四个参数
+
+调用patch函数，本次为初始渲染，需要以vm.$el的元素节点生成一个vnode节点，作为旧dom树节点
+
+
+当数据更新时，会写入data选项，触发Object.defineProperty的setter(src/core/observer/index.js)。
+setter内触发dep.notify方法。
+
+Dep对象(src/core/observer/dep.js)
+notify方法，遍历当前dep依赖对象关联的watcher实例，并触发每个watcher实例的update方法
+
+Watcher对象(src/core/observer/watcher.js)
+update方法，根据状态，分别触发同步更新（run）和异步更新（queueWatcher）
+run同步更新，调用wathcer.get，再次触发updateComponent
+queueWathcer异步更新，
+
+再次调用updateComponent函数时，当前vm._vnode为上次_render函数生成的vnode对象。因此，此次为更新渲染，
+vm.__patch__函数传入prevVnode（旧vdom）、vnode（新vdom）
+
+patch函数，本次为更新渲染，则调用patchVnode，对比新旧vDom树，并更新vm.elm
+
+经过补丁算法，最终进行页面重新渲染
+
+
+patch函数的由来：
 Vue.prototype.__patch__(src/platforms/web/runtime/index.js)
   浏览器，__patch为patch(src/platforms/web/runtime/patch.js)；其他，为空函数
 
-
 patch是createPatchFunction(src/core/vdom/patch.js)的返回值（patch函数），传入参数是nodeOps(src/platforms/web/runtime/node-ops.js)、
 modules是plateformModules(src/platforms/web/runtime/modules/index)和baseModules(src/core/vdom/modules/index)合并后的数组
-
 modules包含create、update和destroy钩子函数
-
 调用nodeOps的tagName方法，获取元素节点标签名
 
-调用createPatchFunction函数，返回patch函数，接收4个参数：oldNode、vnode、hydrating和removeOnly
-
-调用patch函数，若为初始渲染，需要以vm.$el的元素节点生成一个vnode节点，作为旧dom树节点
-若为更新渲染，则调用patchVnode，对比新旧vDom树，并更新vm.elm
+调用createPatchFunction函数，返回patch函数，patch函数接收4个参数：oldNode、vnode、hydrating和removeOnly
