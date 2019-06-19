@@ -21,7 +21,7 @@ const methodsToPatch = [
 /**
  * Intercept mutating methods and emit events
  */
-/* 重写Array变异方法，触发依赖 */
+/* 重写Array变异方法，通知订阅者 */
 methodsToPatch.forEach(function (method) {
   // cache original method
   const original = arrayProto[method]
@@ -42,7 +42,7 @@ methodsToPatch.forEach(function (method) {
     /* 新增元素转为响应数据 */
     if (inserted) ob.observeArray(inserted)
     // notify change
-    /* 触发依赖 */
+    /* 通知订阅者 */
     ob.dep.notify()
     return result
   })

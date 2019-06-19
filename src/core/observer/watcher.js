@@ -150,15 +150,15 @@ export default class Watcher {
   addDep (dep: Dep) {
     /* Dep实例对象的唯一标识 */
     const id = dep.id
-    /* 添加并去重依赖 */
+    /* 添加并去重订阅器 */
     if (!this.newDepIds.has(id)) {
       this.newDepIds.add(id)
       this.newDeps.push(dep)
       /* 多次求值（数据发生变化重新求值的过程）中，
-         避免重复收集依赖 
+         避免重复收集订阅器 
       */
       if (!this.depIds.has(id)) {
-        /* 这个依赖被当前观察实例所观察 */
+        /* 当前订阅者被推入到消息订阅器 */
         dep.addSub(this)
       }
     }

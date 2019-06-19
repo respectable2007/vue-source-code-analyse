@@ -155,7 +155,7 @@ export function defineReactive (
   customSetter?: ?Function,
   shallow?: boolean
 ) {
-  /* 创建当前对象属性的依赖 */
+  /* 创建当前字段的消息订阅器 */
   const dep = new Dep()
 
   const property = Object.getOwnPropertyDescriptor(obj, key)
@@ -199,14 +199,14 @@ export function defineReactive (
     /* 1、返回属性值；2、收集依赖 */
     get: function reactiveGetter () {
       const value = getter ? getter.call(obj) : val
-      /* Dep.target要收集的依赖（观察者） */
+      /* Dep.target当前的订阅者 */
       if (Dep.target) {
-        dep.depend() //当前字段收集依赖
+        dep.depend() //当前字段的消息订阅器收集订阅者
         /* 用来实现Vue.set或$set在嵌套对象上添加属性是响应的 */
         if (childOb) {
           /* 字段值的observer收集依赖 */
           childOb.dep.depend()
-          /* 该属性为数组属性 */
+          /* 字段值为数组，触发数组依赖 */
           if (Array.isArray(value)) {
             dependArray(value)
           }
