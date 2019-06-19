@@ -1,4 +1,4 @@
-/* Web平台 Vue属性 */
+/* Web平台化后Vue属性和方法 */
 import { compileToFunctions } from "../src/platforms/web/compiler";
 
 /* Vue的静态属性 */

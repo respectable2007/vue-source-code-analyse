@@ -1,3 +1,4 @@
+/* 调用_init方法 Vue实例添加的属性和方法 */
 // Vue.prototype._init
 vm._uid = uid++     // 每个Vue实例都拥有一个唯一的 id
 vm._isVue = true    // 这个表示用于避免Vue实例对象被观测(observed)

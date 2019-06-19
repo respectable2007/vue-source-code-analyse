@@ -1,5 +1,5 @@
 import { V4MAPPED } from "dns";
-
+/* Vue new之前Vue原型的属性和方法 */
 // initMixin(Vue)    src/core/instance/init.js **************************************************
 Vue.prototype._init = function (options?: Object) {}
 
