@@ -80,9 +80,9 @@ export default class Watcher {
        当前观察者实例的direty为真
     */
     this.dirty = this.lazy // for lazy watchers
-    /* 与依赖有关，用于避免收集重复依赖和剔除无用依赖 */
-    /* newDeps、newDepIds，用来保存本次求值收集的依赖
-       deps、depIds，用来保存上一次求值收集的依赖
+    /* 与订阅者有关，用于避免收集重复订阅者和剔除无用订阅者 */
+    /* newDeps、newDepIds，用来保存本次求值收集的订阅者
+       deps、depIds，用来保存上一次求值收集的订阅者
     */
     this.deps = []
     this.newDeps = []
@@ -118,7 +118,7 @@ export default class Watcher {
   /**
    * Evaluate the getter, and re-collect dependencies.
    */
-  /* 求值，收集依赖 */
+  /* 求值，收集订阅者 */
   get () {
     pushTarget(this)
     let value
@@ -138,7 +138,7 @@ export default class Watcher {
         traverse(value)
       }
       popTarget()
-      /* 清空本次求值的收集的依赖 */
+      /* 清空本次求值的收集的订阅者 */
       this.cleanupDeps()
     }
     return value
@@ -169,9 +169,9 @@ export default class Watcher {
    */
   cleanupDeps () {
     let i = this.deps.length
-    /* 遍历总deps， 总deps中的依赖不在本次保存的依赖中，
-       说明这个依赖与当前观察者实例不存在依赖关系，
-       解除依赖与观察者实例的联系
+    /* 遍历总deps， 总deps中的订阅者不在本次保存的订阅者中，
+       说明这个订阅者与当前观察者实例不存在订阅者关系，
+       解除订阅者与观察者实例的联系
     */
     while (i--) {
       const dep = this.deps[i]

@@ -50,7 +50,7 @@ export class Observer {
     if (Array.isArray(value)) {
       /* value挂载被重写过的原型对象
          该原型对象指向Array原型，
-         其数组变异方法被重写，触发依赖，
+         其数组变异方法被重写，通知订阅者，
          供开发者获得数组发生改变的信息
       */
       if (hasProto) {
@@ -176,7 +176,7 @@ export function defineReactive (
      需要进行响应处理，就需要获取其字段值。
      如果shallow为false但val为undefined，不会深度观测。
      只有在shallow为false且val不为undefined时，才会深度观测。
-     此时，未重写Object.defineProperty,读取字段值，不会触发依赖等操作
+     此时，未重写Object.defineProperty,读取字段值，不会通知订阅者等操作
   */
   /* val是defineReactive的第三个参数，在walk函数中，
      未传入该参数，此时为undefined。
@@ -196,7 +196,7 @@ export function defineReactive (
   Object.defineProperty(obj, key, {
     enumerable: true,
     configurable: true,
-    /* 1、返回属性值；2、收集依赖 */
+    /* 1、返回属性值；2、收集订阅者 */
     get: function reactiveGetter () {
       const value = getter ? getter.call(obj) : val
       /* Dep.target当前的订阅者 */
@@ -204,9 +204,9 @@ export function defineReactive (
         dep.depend() //当前字段的消息订阅器收集订阅者
         /* 用来实现Vue.set或$set在嵌套对象上添加属性是响应的 */
         if (childOb) {
-          /* 字段值的observer收集依赖 */
+          /* 字段值的observer收集订阅者 */
           childOb.dep.depend()
-          /* 字段值为数组，触发数组依赖 */
+          /* 字段值为数组，通知数组订阅者 */
           if (Array.isArray(value)) {
             dependArray(value)
           }
@@ -214,7 +214,7 @@ export function defineReactive (
       }
       return value
     },
-    /* 1、设置新属性值；2、触发依赖 */
+    /* 1、设置新属性值；2、通知订阅者 */
     set: function reactiveSetter (newVal) {
       const value = getter ? getter.call(obj) : val
 
@@ -241,7 +241,7 @@ export function defineReactive (
       }
       /* 为新属性值添加观测 */
       childOb = !shallow && observe(newVal)
-      /* 触发依赖 */
+      /*通知订阅者 */
       dep.notify()
     }
   })
@@ -259,13 +259,13 @@ export function set (target: Array<any> | Object, key: any, val: any): any {
   ) {
     warn(`Cannot set reactive property on undefined, null, or primitive value: ${(target: any)}`)
   }
-  /* 数组，使用splice方法（变异方法可触发依赖），触发依赖 */
+  /* 数组，使用splice方法（变异方法可通知订阅者），通知订阅者 */
   if (Array.isArray(target) && isValidArrayIndex(key)) {
     target.length = Math.max(target.length, key)
     target.splice(key, 1, val)
     return val
   }
-  /* 对象，通过setter函数，触发依赖 */
+  /* 对象，通过setter函数，通知订阅者 */
   if (key in target && !(key in Object.prototype)) {
     target[key] = val
     return val
@@ -286,7 +286,7 @@ export function set (target: Array<any> | Object, key: any, val: any): any {
   }
   /* target被观测，新添加的属性转为响应式 */
   defineReactive(ob.value, key, val)
-  /* 触发target依赖 */
+  /* 通知target订阅者 */
   ob.dep.notify()
   /* 返回值 */
   return val
@@ -325,7 +325,7 @@ export function del (target: Array<any> | Object, key: any) {
   if (!ob) {
     return
   }
-  /* target响应，触发依赖 */
+  /* target响应，通知订阅者 */
   ob.dep.notify()
 }
 
@@ -333,7 +333,7 @@ export function del (target: Array<any> | Object, key: any) {
  * Collect dependencies on array elements when the array is touched, since
  * we cannot intercept array element access like property getters.
  */
-/* 递归遍历数组及其内部数组项，收集依赖，保证集合与集合项行为一致，仅仅针对对象或数组 */
+/* 递归遍历数组及其内部数组项，收集订阅者，保证集合与集合项行为一致，仅仅针对对象或数组 */
 function dependArray (value: Array<any>) {
   for (let e, i = 0, l = value.length; i < l; i++) {
     e = value[i]

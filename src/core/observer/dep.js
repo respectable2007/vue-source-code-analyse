@@ -45,7 +45,7 @@ export default class Dep {
       // order
       subs.sort((a, b) => a.id - b.id)
     }
-    /* 遍历当前消息订阅器，通知订阅者，触发update方法，更新视图 */
+    /* 遍历当前消息订阅器，通知订阅者，通知update方法，更新视图 */
     for (let i = 0, l = subs.length; i < l; i++) {
       subs[i].update()
     }

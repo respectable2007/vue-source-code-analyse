@@ -40,7 +40,7 @@ export function parsePath (path: string): any {
     return
   }
   const segments = path.split('.')
-  /* 返回一个函数，这个函数内部触发getter */
+  /* 返回一个函数，这个函数内部通知getter */
   return function (obj) {
     /* 未传入obj，返回空 */
     for (let i = 0; i < segments.length; i++) {
