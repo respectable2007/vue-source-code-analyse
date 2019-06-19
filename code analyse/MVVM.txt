@@ -96,8 +96,8 @@ createCompileToFunctionFn(src/compiler/to-function.js)：
 返回一个匿名函数，赋值给compileToFunctions
 
 综上所述，compileToFunctions是一个闭包函数，其作用域链包含createCompileToFunctionFn、
-createCompiler和createCompilerCreator三个函数的活动对象和全局变量对象
-
+createCompiler和createCompilerCreator三个函数的活动对象和全局变量对象。其作用是：将模
+板字符串template编译成渲染函数render
 
 
 patch函数的由来：
