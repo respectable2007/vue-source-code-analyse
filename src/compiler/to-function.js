@@ -21,7 +21,7 @@ function createFunction (code, errors) {
 export function createCompileToFunctionFn (compile: Function): Function {
   const cache = Object.create(null)
 
-  return function    (
+  return function (
     template: string,
     options?: CompilerOptions,
     vm?: Component
