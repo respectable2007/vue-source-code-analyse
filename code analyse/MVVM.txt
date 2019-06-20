@@ -34,16 +34,7 @@ updateComponent函数(src/core/instance/lifecycle.js)：
 vm._render(src/core/instance/render.js)是在js加载时，调用renderMixin方法时定义的
   vm._render内部调用vm.$options.render,这个函数是在web平台$mount方法内已经生成（src/platforms/web/entry-runtime-with-compiler.js）
   Vue.prototype.$mount函数内，创建了render函数并挂载到当前Vue实例上：
-  {render, staticRenderFns} 是函数被调用的结果
-  这个函数可以访问到compile、baseCompile、baseOptions(src/platforms/web/compiler/options.js)三个参数
-
-  render是根据compile(template, options)返回值compiled.render，使用new Function生成的一个函数
-  compile函数(src/compiler/create-compiler.js)实际调用baseCompile函数(src/compiler/index.js)
-  baseCompile函数做了3件事情：
-    1、将模板和选项转为ast
-    2、ast优化，检测静态attrs、class、静态dom子树
-    3、通过generate函数，生成render函数的原始字符串和staticRenderFns原始字符串
-  generate函数根据ast和选项生成render和staticRenderFns的原始字符串
+  {render, staticRenderFns} 是compileToFunctions函数被调用的结果
   render函数字符串最终包含_c和实例选项
 因此，调用render函数，会访问data选项，进而触发Object.defineProperty的getter。
 getter内又可以调用dep对象的depend方法,收集依赖,返回VNode对象。
@@ -87,7 +78,8 @@ compileToFunctions(src/platforms/web/compiler/index.js)的由来：
 调用createCompiler函数，传入baseOptions参数，返回一个对象，包含compileToFunctions
 
 createCompiler(src/compiler/index.js)：
-调用createCompilerCreator函数()，传入baseCompile参数，返回一个createCompiler函数。
+引用js时，已经生成createCompiler。其生成过程是：调用createCompilerCreator函数()，
+传入baseCompile参数，返回一个createCompiler函数。
 createCompiler是一个闭包函数，可以调用baseCompile函数。其内部声明了compile函数，
 调用了createCompileToFunctionFn函数（参数为compile函数），其返回值是一个函数，就
 是compileToFunctions
@@ -96,8 +88,9 @@ createCompileToFunctionFn(src/compiler/to-function.js)：
 返回一个匿名函数，赋值给compileToFunctions
 
 综上所述，compileToFunctions是一个闭包函数，其作用域链包含createCompileToFunctionFn、
-createCompiler和createCompilerCreator三个函数的活动对象和全局变量对象。其作用是：将模
-板字符串template编译成渲染函数render
+createCompiler和createCompilerCreator三个函数的活动对象和全局变量对象，即该函数可以访
+问到compile、baseCompile、baseOptions(src/platforms/web/compiler/options.js)三个参
+数。
 
 compileToFunctions函数，传入了模板字符串template、对象、当前vue实例
 对象的属性作用如下：
@@ -105,7 +98,19 @@ shouldDecodeNewlines:IE浏览器中，获取innerHTML时，其元素属性值是
 shouldDecodeNewlinesForHref:chrome浏览器，获取innerHTML，a标签href属性是否进行兼容处理
 delimiters：改变纯文本插入分隔符，默认为["{{","}"}
 comments：是否保留且渲染HTML注释，默认为false
+compileToFunctions函数作用是：缓存渲染函数，编译模板字符串，创建函数，输出编译和创建函数
+错误信息
 
+编译模板字符串是调用compile函数的结果
+  compile函数(src/compiler/create-compiler.js)作用：
+  1、合并当前实例选项和baseOptions；2、编译；3、检测编译错误
+  baseCompile函数(src/compiler/index.js)做了3件事情：
+    1、将模板和选项转为ast
+    2、ast优化，检测静态attrs、class、静态dom子树
+    3、通过generate函数，生成render函数的原始字符串和staticRenderFns原始字符串
+  generate函数根据ast和选项生成render和staticRenderFns的原始字符串
+  
+创建函数：render是根据字符串函数体，使用new Function创建的函数
 
 patch函数的由来：
 Vue.prototype.__patch__(src/platforms/web/runtime/index.js)

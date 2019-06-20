@@ -20,7 +20,11 @@ function createFunction (code, errors) {
 
 export function createCompileToFunctionFn (compile: Function): Function {
   const cache = Object.create(null)
-
+  /*1、缓存编译结果，通过 createCompileToFunctionFn 函数内声明的 cache 常量实现。
+    2、调用 compile 函数将模板字符串转成渲染函数字符串
+    3、调用 createFunction 函数将渲染函数字符串转成真正的渲染函数
+    4、打印编译错误，包括：模板字符串 -> 渲染函数字符串 以及 渲染函数字符串 -> 渲染函数 这两个阶段的错误
+  */
   return function (
     template: string,
     options?: CompilerOptions,
@@ -61,7 +65,7 @@ export function createCompileToFunctionFn (compile: Function): Function {
     // compile
     /* 编译
        compile函数其实是createCompiler(src/compiler/index.js)内开头声明的compile函数
-       编译结果是一个对象，包含render和staticRenderFns
+       编译结果是一个对象，包含render（字符串）和staticRenderFns（字符串数组）
     */
     const compiled = compile(template, options)
 
