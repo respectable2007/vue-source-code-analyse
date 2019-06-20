@@ -33,9 +33,9 @@ updateComponent函数(src/core/instance/lifecycle.js)：
 
 vm._render(src/core/instance/render.js)是在js加载时，调用renderMixin方法时定义的
   vm._render内部调用vm.$options.render,这个函数是在web平台$mount方法内已经生成（src/platforms/web/entry-runtime-with-compiler.js）
-  Vue.prototype.$mount函数，创建了render函数：
-  {render, staticRenderFns} 是createCompileToFunctionFn(src/compiler/to-function.js)返回的匿名函数被调用的结果
-  这个匿名函数可以访问到compile、baseCompile、baseOptions(src/platforms/web/compiler/options.js)三个参数
+  Vue.prototype.$mount函数内，创建了render函数并挂载到当前Vue实例上：
+  {render, staticRenderFns} 是函数被调用的结果
+  这个函数可以访问到compile、baseCompile、baseOptions(src/platforms/web/compiler/options.js)三个参数
 
   render是根据compile(template, options)返回值compiled.render，使用new Function生成的一个函数
   compile函数(src/compiler/create-compiler.js)实际调用baseCompile函数(src/compiler/index.js)
@@ -98,6 +98,13 @@ createCompileToFunctionFn(src/compiler/to-function.js)：
 综上所述，compileToFunctions是一个闭包函数，其作用域链包含createCompileToFunctionFn、
 createCompiler和createCompilerCreator三个函数的活动对象和全局变量对象。其作用是：将模
 板字符串template编译成渲染函数render
+
+compileToFunctions函数，传入了模板字符串template、对象、当前vue实例
+对象的属性作用如下：
+shouldDecodeNewlines:IE浏览器中，获取innerHTML时，其元素属性值是否进行兼容处理
+shouldDecodeNewlinesForHref:chrome浏览器，获取innerHTML，a标签href属性是否进行兼容处理
+delimiters：改变纯文本插入分隔符，默认为["{{","}"}
+comments：是否保留且渲染HTML注释，默认为false
 
 
 patch函数的由来：

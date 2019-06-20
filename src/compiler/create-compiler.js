@@ -13,7 +13,8 @@ export function createCompilerCreator (baseCompile: Function): Function {
       const finalOptions = Object.create(baseOptions)
       const errors = []
       const tips = []
-
+      
+      /* 警告函数，保存检测到的错误，添加到errors数组内 */
       let warn = (msg, range, tip) => {
         (tip ? tips : errors).push(msg)
       }

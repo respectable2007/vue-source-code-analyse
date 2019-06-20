@@ -8,7 +8,7 @@ type CompiledFunctionResult = {
   render: Function;
   staticRenderFns: Array<Function>;
 };
-
+/* 字符串转函数，转换失败时，错误保存到errors数组，返回空函数 */
 function createFunction (code, errors) {
   try {
     return new Function(code)
@@ -31,6 +31,7 @@ export function createCompileToFunctionFn (compile: Function): Function {
     delete options.warn
 
     /* istanbul ignore if */
+    /* new Function是否可用，并给出一些信息提示 */
     if (process.env.NODE_ENV !== 'production') {
       // detect possible CSP restriction
       try {
@@ -49,6 +50,7 @@ export function createCompileToFunctionFn (compile: Function): Function {
     }
 
     // check cache
+    /* 缓存是否存在模板编译器 */
     const key = options.delimiters
       ? String(options.delimiters) + template
       : template
@@ -57,9 +59,14 @@ export function createCompileToFunctionFn (compile: Function): Function {
     }
 
     // compile
+    /* 编译
+       compile函数其实是createCompiler(src/compiler/index.js)内开头声明的compile函数
+       编译结果是一个对象，包含render和staticRenderFns
+    */
     const compiled = compile(template, options)
 
     // check compilation errors/tips
+    /* 检测编译是否存在错误和信息提示 */
     if (process.env.NODE_ENV !== 'production') {
       if (compiled.errors && compiled.errors.length) {
         if (options.outputSourceRange) {
@@ -90,7 +97,9 @@ export function createCompileToFunctionFn (compile: Function): Function {
     // turn code into functions
     const res = {}
     const fnGenErrors = []
+    /* 渲染函数 */
     res.render = createFunction(compiled.render, fnGenErrors)
+    /* 静态渲染函数数组 */
     res.staticRenderFns = compiled.staticRenderFns.map(code => {
       return createFunction(code, fnGenErrors)
     })
@@ -99,6 +108,7 @@ export function createCompileToFunctionFn (compile: Function): Function {
     // this should only happen if there is a bug in the compiler itself.
     // mostly for codegen development use
     /* istanbul ignore if */
+    /* 检测字符串转函数是否存在错误 */
     if (process.env.NODE_ENV !== 'production') {
       if ((!compiled.errors || !compiled.errors.length) && fnGenErrors.length) {
         warn(
@@ -108,7 +118,7 @@ export function createCompileToFunctionFn (compile: Function): Function {
         )
       }
     }
-
+    /* 保存到缓存中，并被返回 */
     return (cache[key] = res)
   }
 }
