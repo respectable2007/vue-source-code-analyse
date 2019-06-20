@@ -96,7 +96,7 @@ compileToFunctions函数，传入了模板字符串template、对象、当前vue
 对象的属性作用如下：
 shouldDecodeNewlines:IE浏览器中，获取innerHTML时，其元素属性值是否进行兼容处理
 shouldDecodeNewlinesForHref:chrome浏览器，获取innerHTML，a标签href属性是否进行兼容处理
-delimiters：改变纯文本插入分隔符，默认为["{{","}"}
+delimiters：改变纯文本插入分隔符，默认为["{{","}"}]
 comments：是否保留且渲染HTML注释，默认为false
 compileToFunctions函数作用是：缓存渲染函数，编译模板字符串，创建函数，输出编译和创建函数
 错误信息
@@ -119,10 +119,12 @@ patch函数的由来：
 Vue.prototype.__patch__(src/platforms/web/runtime/index.js)
   浏览器，__patch为patch(src/platforms/web/runtime/patch.js)；其他，为空函数
 
-patch是createPatchFunction(src/core/vdom/patch.js)的返回值（patch函数），传入参数是nodeOps(src/platforms/web/runtime/node-ops.js)、
-modules是plateformModules(src/platforms/web/runtime/modules/index)和baseModules(src/core/vdom/modules/index)合并后的数组
-modules包含create、update和destroy钩子函数
-调用nodeOps的tagName方法，获取元素节点标签名
+patch是createPatchFunction(src/core/vdom/patch.js)的返回值（patch函数），传入参数是nodeOps(src/platforms/web/runtime/node-ops.js)和modules。
+modules是plateformModules(src/platforms/web/runtime/modules/index)和baseModules(src/core/vdom/modules/index)合并后的数组，
+包含create、update和destroy钩子函数。
+nodeOps包含一些原生dom操作：
+  createElement：生成dom节点元素
+  tagName：获取元素节点标签名
 
 调用createPatchFunction函数，返回patch函数，patch函数接收4个参数：oldNode、vnode、hydrating和removeOnly
 

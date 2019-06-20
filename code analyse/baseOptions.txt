@@ -1,0 +1,45 @@
+baseOptions对象modules选项最终输出的形式：
+modules(src/platforms/web/compiler/modules/index.js)
+输出一个数组，包含klass、style和model
+export default [
+  //klass
+  {
+    staticKeys: ['staticClass'],
+    transformNode,
+    genData
+  },
+  //style
+  {
+    staticKeys: ['staticStyle'],
+    transformNode,
+    genData
+  },
+  //model
+  {
+    preTransformNode
+  }
+]
+directives(src/platforms/web/compiler/directives/index.js)
+输出一个对象，包含model、html、text函数
+export default {
+  // model.js 的输出
+  export default function model (
+    el: ASTElement,
+    dir: ASTDirective,
+    _warn: Function
+  ): ?boolean {
+    // 函数体...
+  }
+  // html.js 的输出
+  export default function html (el: ASTElement, dir: ASTDirective) {
+    if (dir.value) {
+      addProp(el, 'innerHTML', `_s(${dir.value})`)
+    }
+  }
+  // text.js 的输出
+  export default function text (el: ASTElement, dir: ASTDirective) {
+    if (dir.value) {
+      addProp(el, 'textContent', `_s(${dir.value})`)
+    }
+  }
+}

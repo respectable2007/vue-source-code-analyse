@@ -124,6 +124,7 @@ export function createPatchFunction (backend) {
 
   let creatingElmInVPre = 0
 
+  /* 根据vnode对象，生成DOM树 */
   function createElm (
     vnode,
     insertedVnodeQueue,
@@ -283,7 +284,7 @@ export function createPatchFunction (backend) {
       }
     }
   }
-
+  /* 递归子节点，并生成dom节点，添加到父节点上 */
   function createChildren (vnode, children, insertedVnodeQueue) {
     if (Array.isArray(children)) {
       if (process.env.NODE_ENV !== 'production') {
@@ -564,6 +565,7 @@ export function createPatchFunction (backend) {
     }
     if (isUndef(vnode.text)) {
       if (isDef(oldCh) && isDef(ch)) {
+        /* 递归更新子节点 */
         if (oldCh !== ch) updateChildren(elm, oldCh, ch, insertedVnodeQueue, removeOnly)
       } else if (isDef(ch)) {
         if (process.env.NODE_ENV !== 'production') {
