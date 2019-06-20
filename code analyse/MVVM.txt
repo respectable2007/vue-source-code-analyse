@@ -89,8 +89,7 @@ createCompileToFunctionFn(src/compiler/to-function.js)：
 
 综上所述，compileToFunctions是一个闭包函数，其作用域链包含createCompileToFunctionFn、
 createCompiler和createCompilerCreator三个函数的活动对象和全局变量对象，即该函数可以访
-问到compile、baseCompile、baseOptions(src/platforms/web/compiler/options.js)三个参
-数。
+问到compile、baseCompile、baseOptions三个参数。
 
 compileToFunctions函数，传入了模板字符串template、对象、当前vue实例
 对象的属性作用如下：
@@ -103,7 +102,8 @@ compileToFunctions函数作用是：缓存渲染函数，编译模板字符串�
 
 编译模板字符串是调用compile函数的结果
   compile函数(src/compiler/create-compiler.js)作用：
-  1、合并当前实例选项和baseOptions；2、编译；3、检测编译错误
+    1、合并当前实例选项和baseOptions；2、编译；3、检测编译错误
+    baseOptions(src/platforms/web/compiler/options.js)
   baseCompile函数(src/compiler/index.js)做了3件事情：
     1、将模板和选项转为ast
     2、ast优化，检测静态attrs、class、静态dom子树

@@ -2,6 +2,7 @@
 
 import { makeMap } from 'shared/util'
 
+/* 函数，是否为一元标签 */
 export const isUnaryTag = makeMap(
   'area,base,br,col,embed,frame,hr,img,input,isindex,keygen,' +
   'link,meta,param,source,track,wbr'
@@ -9,6 +10,9 @@ export const isUnaryTag = makeMap(
 
 // Elements that you can, intentionally, leave open
 // (and which close themselves)
+/* 函数，判断是否可以被浏览器自动补全闭合的标签，
+   比如<p>some content,浏览器会自动补全为<p>some content</p>
+*/
 export const canBeLeftOpenTag = makeMap(
   'colgroup,dd,dt,li,options,p,td,tfoot,th,thead,tr,source'
 )

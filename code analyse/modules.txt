@@ -1,0 +1,17 @@
+baseOptions对象modules选项最终输出的形式：
+modules(src/platforms/web/compiler/modules/index.js)
+export default [
+  {
+    staticKeys: ['staticClass'],
+    transformNode,
+    genData
+  },
+  {
+    staticKeys: ['staticStyle'],
+    transformNode,
+    genData
+  },
+  {
+    preTransformNode
+  }
+]
