@@ -75,10 +75,11 @@ patch函数，本次为更新渲染，则调用patchVnode，对比新旧vDom树�
 
 
 compileToFunctions(src/platforms/web/compiler/index.js)的由来：
-调用createCompiler函数，传入baseOptions参数，返回一个对象，包含compileToFunctions
+调用createCompiler函数，传入baseOptions参数（基本选项），返回一个对象，包含compileToFunctions
 
-createCompiler(src/compiler/index.js)：
-引用js时，已经生成createCompiler。其生成过程是：调用createCompilerCreator函数()，
+
+创建编译器，createCompiler(src/compiler/index.js)：
+引用js时，已经生成createCompiler。其生成过程是：调用createCompilerCreator函数(“编译器创造者”的创造者)，
 传入baseCompile参数，返回一个createCompiler函数。
 createCompiler是一个闭包函数，可以调用baseCompile函数。其内部声明了compile函数，
 调用了createCompileToFunctionFn函数（参数为compile函数），其返回值是一个函数，就
@@ -102,7 +103,7 @@ compileToFunctions函数作用是：缓存渲染函数，编译模板字符串�
 
 编译模板字符串是调用compile函数的结果
   compile函数(src/compiler/create-compiler.js)作用：
-    1、合并当前实例选项和baseOptions；2、编译；3、检测编译错误
+    1、合并当前实例编译器选项和baseOptions；2、编译；3、检测编译错误
     baseOptions(src/platforms/web/compiler/options.js)
   baseCompile函数(src/compiler/index.js)做了3件事情：
     1、将模板和选项转为ast
@@ -111,6 +112,8 @@ compileToFunctions函数作用是：缓存渲染函数，编译模板字符串�
   generate函数根据ast和选项生成render和staticRenderFns的原始字符串
   
 创建函数：render是根据字符串函数体，使用new Function创建的函数
+因此，在创建编译器的时候传递了基本编译器选项参数，当真正使用编译器编译模板时，
+依然可以传递编译器选项，并且新的选项和基本选项会以合适的方式融合或覆盖。
 
 patch函数的由来：
 Vue.prototype.__patch__(src/platforms/web/runtime/index.js)

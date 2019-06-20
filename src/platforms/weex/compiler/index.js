@@ -27,6 +27,7 @@ export const baseOptions: WeexCompilerOptions = {
   staticKeys: genStaticKeys(modules)
 }
 
+/* 创建编译器 */
 const compiler = createCompiler(baseOptions)
 
 export function compile (
