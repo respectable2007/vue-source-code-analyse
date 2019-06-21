@@ -35,7 +35,7 @@ const sharedPropertyDefinition = {
   set: noop
 }
 
-/* data属性以访问器形式挂载在当前Vue实例的_data上，即vm._data为真正的数据对象 */
+/* 给当前vue实例对象设置代理，访问vm.xx，实际访问vm._data.xx */
 export function proxy (target: Object, sourceKey: string, key: string) {
   sharedPropertyDefinition.get = function proxyGetter () {
     return this[sourceKey][key]
@@ -128,6 +128,7 @@ function initData (vm: Component) {
     )
   }
   // proxy data on instance
+  /* vue实例data设置代理 */
   const keys = Object.keys(data)
   const props = vm.$options.props
   const methods = vm.$options.methods
